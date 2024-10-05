@@ -7,8 +7,10 @@
 
 import SwiftUI
 
+
 struct LoginView: View {
-    @ObservedObject var viewModel = LoginViewModel()
+    @ObservedObject var viewModel: LoginViewModel
+    @State private var navigateToMain = false
 
     var body: some View {
         VStack {
@@ -124,15 +126,11 @@ struct LoginView: View {
                 .ignoresSafeArea() // Ensures the gradient follows the safe area
             }
         )
-        .alert(isPresented: $viewModel.isAuthenticated) {
-            Alert(title: Text("Success"), message: Text("Login Successful!"), dismissButton: .default(Text("OK")))
+        
+        .fullScreenCover(isPresented: $viewModel.isAuthenticated) {  // Navigate when authenticated
+            MainView()  // Show MainView after successful login
         }
     }
 }
 
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
-    }
-}
 

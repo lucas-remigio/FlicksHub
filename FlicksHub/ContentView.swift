@@ -8,16 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var loginViewModel = LoginViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                if loginViewModel.isAuthenticated {
+                    MainView()
+                        .transition(.move(edge: .trailing))  // Add the transition
+                } else {
+                    LoginView(viewModel: loginViewModel)
+                        .transition(.move(edge: .leading))  // Add the transition
+                }
+            }
         }
-        .padding()
     }
 }
+
 
 #Preview {
     ContentView()
