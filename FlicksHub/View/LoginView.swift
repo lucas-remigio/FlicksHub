@@ -39,8 +39,12 @@ struct LoginView: View {
                         .accentColor(.white)
                 }
                 .padding()
-                .background(Color("SecondaryColor").opacity(0.5))
-                .cornerRadius(10)
+                .background(Color("MidnightGrayColor").opacity(0.5))
+                .cornerRadius(30)
+                .overlay(
+                        RoundedRectangle(cornerRadius: 30)
+                            .stroke(Color.white, lineWidth: 1)
+                    )
                 .padding(.horizontal, 30)
                 .foregroundColor(.white)
                 
@@ -52,10 +56,15 @@ struct LoginView: View {
                         .foregroundColor(.white)
                 }
                 .padding()
-                .background(Color("SecondaryColor").opacity(0.5))
-                .cornerRadius(10)
+                .background(Color("MidnightGrayColor").opacity(0.5))
+                .cornerRadius(30)
+                .overlay(
+                        RoundedRectangle(cornerRadius: 30)
+                            .stroke(Color.white, lineWidth: 1)
+                    )
                 .padding(.horizontal, 30)
                 .padding(.top, 15)
+                
                 
                 // Login Button
                 Button(action: {
@@ -69,7 +78,7 @@ struct LoginView: View {
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .padding()
                         .background(Color("AccentColor"))
-                        .cornerRadius(20)
+                        .cornerRadius(30)
                         .padding(.horizontal, 100)
                 }
                 .padding(.top, 100)
@@ -100,7 +109,7 @@ struct LoginView: View {
                 
                 // Add the fading effect using a gradient
                 LinearGradient(
-                    gradient: Gradient(colors: [Color.clear, Color("PrimaryColor").opacity(1.2)]),
+                    gradient: Gradient(colors: [Color.clear, Color("MidnightColor").opacity(1.2)]),
                     startPoint: .top,
                     endPoint: .bottom
                 )
