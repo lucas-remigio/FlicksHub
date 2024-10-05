@@ -9,23 +9,28 @@ import Foundation
 
 class MainViewModel: ObservableObject {
     @Published var movieList: [Movie]?
+    @Published var posterImageURLs: [String]?
 
-        init() {
-            // Fetch movies when the view model is initialized
-            retrieveMovies()
-        }
-
-        func retrieveMovies() {
-            APICaller.getTrendingMovies() { result in
-                switch result {
-                case .success(let response):
-                    DispatchQueue.main.async {
-                        self.movieList = response.results
-                        print(self.movieList as Any)
+    func retrieveMovies() {
+        APICaller.getTrendingMovies() { [weak self] result in
+            switch result {
+            case .success(let movies):
+                self?.movieList = movies.results
+                
+                // Map over the movies to create full image URLs
+                self?.posterImageURLs = movies.results.compactMap { movie in
+                    if let posterPath = movie.posterPath {
+                        return "\(NetworkConstant.shared.imageServerAddress)\(posterPath)"
                     }
-                case .failure(let error):
-                    print("Failed to retrieve movies: \(error)")
+                    return nil  // Skip if no posterPath
                 }
+                
+                // For testing purposes, print the image URLs
+                print("Poster Image URLs: \(self?.posterImageURLs ?? [])")
+            
+            case .failure(let error):
+                print("Failed to retrieve movies: \(error)")
             }
         }
+    }
 }

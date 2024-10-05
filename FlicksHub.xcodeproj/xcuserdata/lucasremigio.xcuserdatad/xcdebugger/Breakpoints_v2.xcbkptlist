@@ -23,16 +23,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "ACA75550-8A6B-4387-9380-8EFA5982710C"
-            shouldBeEnabled = "Yes"
+            uuid = "B3162554-078D-47FA-B9D9-4889D3381687"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FlicksHub/ViewModel/MainViewModel.swift"
+            filePath = "FlicksHub/Networking/TheMovieDB.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
-            landmarkName = "retrieveMovies()"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "getTrendingMovies(completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

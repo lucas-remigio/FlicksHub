@@ -126,10 +126,6 @@ struct LoginView: View {
                 .ignoresSafeArea() // Ensures the gradient follows the safe area
             }
         )
-        
-        .fullScreenCover(isPresented: $viewModel.isAuthenticated) {  // Navigate when authenticated
-            MainView()  // Show MainView after successful login
-        }
     }
 }
 

@@ -8,8 +8,10 @@
 import Foundation
 
 enum NetworkError: Error {
-    case urlError
-    case canNotParseData
+    case invalidURL
+    case noData
+    case networkError(Error)  // Wrap generic Error
+    case decodingError(Error)  // Wrap decoding Error
 }
 
 public class MovieDBAPI {
@@ -20,34 +22,43 @@ public class MovieDBAPI {
 }
 
 public class APICaller {
+    static let shared = APICaller()
     
-    
-    static func getTrendingMovies(completionHandler: @escaping (APIResult<TrendingMovieModel, NetworkError>) -> Void) {
-        let urlString = NetworkConstant.shared.serverAddress + "trending/all/day"
+    static func getTrendingMovies(completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void) {
+        let urlString = NetworkConstant.shared.serverAddress + "/movie/popular?language=en-US&page=1"
         
         // Ensure URL is valid
         guard let url = URL(string: urlString) else {
-            completionHandler(.failure(.urlError))
+            completion(.failure(.invalidURL))
             return
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        print(MovieDBAPI.getKey())
         request.setValue("Bearer \(MovieDBAPI.getKey())", forHTTPHeaderField: "Authorization")
         
-        URLSession.shared.dataTask(with: url) { dataResponse, urlResponse , error in
-            if error == nil,
-               let data = dataResponse,
-               let resultData = try? JSONDecoder().decode(TrendingMovieModel.self, from: data) {
-                completionHandler(.success(resultData))
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(.networkError(error)))
+                return
             }
-            else {
-                completionHandler(.failure(.canNotParseData))
+            
+            guard let data = data else {
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            do {
+                // Decode the response data
+                let decodedResponse = try JSONDecoder().decode(PopularMoviesResponse.self, from: data)
+                completion(.success(decodedResponse))
+            } catch {
+                completion(.failure(.networkError(error)))
             }
         }.resume()
     }
 }
+
 
 enum APIResult<Success, Failure> where Failure: Error {
     case success(Success)

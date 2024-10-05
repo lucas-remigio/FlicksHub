@@ -8,57 +8,53 @@
 
 import Foundation
 
-// MARK: - TrendingMovieModel
-struct TrendingMovieModel: Codable {
+// Root response that contains page info and an array of movies
+struct PopularMoviesResponse: Codable {
     let page: Int
     let results: [Movie]
-    let totalPages, totalResults: Int
+    let totalPages: Int
+    let totalResults: Int
 
     enum CodingKeys: String, CodingKey {
-        case page, results
+        case page
+        case results
         case totalPages = "total_pages"
         case totalResults = "total_results"
     }
 }
 
-// MARK: - Movie
-struct Movie: Codable {
-    let adult: Bool
-    let backdropPath: String
+// Movie model representing each movie in the results array
+struct Movie: Codable, Identifiable {
     let id: Int
-    let name: String?
-    let originalLanguage: OriginalLanguage
-    let originalName: String?
-    let overview, posterPath: String
-    let mediaType: MediaType
-    let genreIDS: [Int]
+    let adult: Bool
+    let backdropPath: String?
+    let genreIds: [Int]
+    let originalLanguage: String
+    let originalTitle: String
+    let overview: String
     let popularity: Double
-    let firstAirDate: String?
+    let posterPath: String?
+    let releaseDate: String
+    let title: String
+    let video: Bool
     let voteAverage: Double
     let voteCount: Int
-    let originCountry: [String]?
-    let title, originalTitle, releaseDate: String?
-    let video: Bool?
 
     enum CodingKeys: String, CodingKey {
+        case id
         case adult
         case backdropPath = "backdrop_path"
-        case id, name
+        case genreIds = "genre_ids"
         case originalLanguage = "original_language"
-        case originalName = "original_name"
+        case originalTitle = "original_title"
         case overview
-        case posterPath = "poster_path"
-        case mediaType = "media_type"
-        case genreIDS = "genre_ids"
         case popularity
-        case firstAirDate = "first_air_date"
+        case posterPath = "poster_path"
+        case releaseDate = "release_date"
+        case title
+        case video
         case voteAverage = "vote_average"
         case voteCount = "vote_count"
-        case originCountry = "origin_country"
-        case title
-        case originalTitle = "original_title"
-        case releaseDate = "release_date"
-        case video
     }
 }
 
@@ -73,3 +69,4 @@ enum OriginalLanguage: String, Codable {
     case ko = "ko"
     case th = "th"
 }
+

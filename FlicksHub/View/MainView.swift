@@ -8,11 +8,39 @@
 import SwiftUI
 
 struct MainView: View {
-    @ObservedObject var mainViewModel = MainViewModel()
+    @ObservedObject var viewModel = MainViewModel()
     @State var searchText: String = ""
     
+    // Define the grid layout with two columns
+        let columns = [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
+    
     var body: some View {
-        Text("Movie list")
+        ScrollView {
+            if ((viewModel.posterImageURLs?.isEmpty) == nil) {
+                Text("Loading images...")
+            } else {
+                // Use LazyVGrid to display the images in a grid
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(viewModel.posterImageURLs!, id: \.self) { imageUrl in
+                        AsyncImage(url: URL(string: imageUrl)) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                        } placeholder: {
+                            ProgressView()  // Show loading spinner until the image is loaded
+                        }
+                        .padding()
+                    }
+                }
+                .padding()  // Add padding around the grid
+            }
+        }
+        .onAppear {
+            viewModel.retrieveMovies()  // Fetch movies when the view appears
+        }
     }
 }
 
