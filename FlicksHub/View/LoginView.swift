@@ -31,14 +31,15 @@ struct LoginView: View {
                 // Username Field
                 HStack {
                     Image(systemName: "person")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white)
                     TextField("Username", text: $username)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .foregroundColor(.white)
+                        .accentColor(.white)
                 }
                 .padding()
-                .background(Color(.systemGray5).opacity(0.5))
+                .background(Color("SecondaryColor").opacity(0.5))
                 .cornerRadius(10)
                 .padding(.horizontal, 30)
                 .foregroundColor(.white)
@@ -46,12 +47,12 @@ struct LoginView: View {
                 // Password Field
                 HStack {
                     Image(systemName: "lock")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white)
                     SecureField("Password", text: $password)
                         .foregroundColor(.white)
                 }
                 .padding()
-                .background(Color(.systemGray5).opacity(0.5))
+                .background(Color("SecondaryColor").opacity(0.5))
                 .cornerRadius(10)
                 .padding(.horizontal, 30)
                 .padding(.top, 15)
@@ -61,15 +62,17 @@ struct LoginView: View {
                     // Handle login action here
                 }) {
                     Text("Login")
-                        .font(.headline)
+                        .font(.title2)
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .padding()
                         .background(Color("AccentColor"))
                         .cornerRadius(20)
                         .padding(.horizontal, 100)
                 }
-                .padding(.top, 20)
+                .padding(.top, 100)
                 
                 // Register Link
                 HStack {
@@ -83,16 +86,26 @@ struct LoginView: View {
                             .underline()
                     }
                 }
-                .padding(.top, 10)
+                .padding(.top, 20)
                 
             }
             .padding(.bottom, 100)
         }
         .background(
-            Image("movie-background") // Use the appropriate background image
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
+            ZStack {
+                Image("movie-background") // Use the appropriate background image
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                
+                // Add the fading effect using a gradient
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.clear, Color("PrimaryColor").opacity(1.2)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea() // Ensures the gradient follows the safe area
+            }
         )
     }
 }
