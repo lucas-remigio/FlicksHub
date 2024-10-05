@@ -53,7 +53,6 @@ struct MainView: View {
                         }
                     }
                 }
-                .padding()  // Add padding around the grid
             }
         }
         .background(Color("MidnightColor"))  // Add a blue background color to the entire scroll view
