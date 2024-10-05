@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var username: String = ""
-    @State private var password: String = ""
+    @ObservedObject var viewModel = LoginViewModel()
 
     var body: some View {
         VStack {
@@ -32,7 +31,7 @@ struct LoginView: View {
                 HStack {
                     Image(systemName: "person")
                         .foregroundColor(.white)
-                    TextField("Username", text: $username)
+                    TextField("Username", text: $viewModel.username)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .foregroundColor(.white)
@@ -52,7 +51,7 @@ struct LoginView: View {
                 HStack {
                     Image(systemName: "lock")
                         .foregroundColor(.white)
-                    SecureField("Password", text: $password)
+                    SecureField("Password", text: $viewModel.password)
                         .foregroundColor(.white)
                 }
                 .padding()
@@ -66,9 +65,17 @@ struct LoginView: View {
                 .padding(.top, 15)
                 
                 
+                // Error Message
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding(.top, 10)
+                }
+                
                 // Login Button
                 Button(action: {
                     // Handle login action here
+                    viewModel.login()
                 }) {
                     Text("Login")
                         .font(.title2)
@@ -83,12 +90,13 @@ struct LoginView: View {
                 }
                 .padding(.top, 100)
                 
+                
                 // Register Link
                 HStack {
                     Text("Don't have an account?")
                         .foregroundColor(.white)
                     Button(action: {
-                        // Handle registration navigation
+                        // Handle register logic here
                     }) {
                         Text("Register here")
                             .foregroundColor(.blue)
@@ -116,6 +124,9 @@ struct LoginView: View {
                 .ignoresSafeArea() // Ensures the gradient follows the safe area
             }
         )
+        .alert(isPresented: $viewModel.isAuthenticated) {
+            Alert(title: Text("Success"), message: Text("Login Successful!"), dismissButton: .default(Text("OK")))
+        }
     }
 }
 
