@@ -30,8 +30,8 @@
             filePath = "FlicksHub/Networking/TheMovieDB.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "40"
-            endingLineNumber = "40"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
             landmarkName = "getTrendingMovies(completion:)"
             landmarkType = "7">
          </BreakpointContent>

@@ -24,7 +24,7 @@ struct PopularMoviesResponse: Codable {
 }
 
 // Movie model representing each movie in the results array
-struct Movie: Codable, Identifiable {
+class Movie: Codable, Identifiable {
     let id: Int
     let adult: Bool
     let backdropPath: String?

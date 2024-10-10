@@ -12,26 +12,20 @@ struct MainView: View {
     @State var searchText: String = ""
     
     // Define the grid layout with two columns
-        let columns = [
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ]
+    let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     
     var body: some View {
         NavigationView {
             ScrollView {
-                if viewModel.posterImageURLs?.isEmpty ?? true {
-                    Text("Loading images...")
-                        .foregroundColor(.white)
-                } else {
-                    // Use LazyVGrid to display the images in a grid
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        // Cycle through the image urls
-                        ForEach(viewModel.posterImageURLs!, id: \.self) { imageUrl in
-                            // Link the images to the detail pages
-                            NavigationLink(destination: DetailView(imageUrl: imageUrl)){
-                                // Load the images asyncronously
-                                AsyncImage(url: URL(string: imageUrl)) { phase in
+                LazyVGrid(columns: columns, spacing: 20) {
+                   ForEach(viewModel.movieList) { movie in
+                        if let posterPath = movie.posterPath,
+                           let imageUrl = URL(string: "\(NetworkConstant.shared.imageServerAddress)\(posterPath)") {
+                            NavigationLink(destination: DetailView(movieId: movie.id)) {
+                                AsyncImage(url: imageUrl) { phase in
                                     switch phase {
                                         case .empty:
                                             ProgressView()  // Show loading spinner while image is being fetched
@@ -57,14 +51,16 @@ struct MainView: View {
                                                 .frame(height: 300)
                                     }
                                 }
-                            }.buttonStyle(PlainButtonStyle())
+                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
+                .padding()
             }
-            .background(Color("MidnightColor"))  // Add a blue background color to the entire scroll view
+            .background(Color("MidnightColor"))
             .onAppear {
-                viewModel.retrieveMovies()  // Fetch movies when the view appears
+                viewModel.retrieveMovies()
             }
         }
     }

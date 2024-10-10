@@ -14,6 +14,11 @@ enum NetworkError: Error {
     case decodingError(Error)  // Wrap decoding Error
 }
 
+enum APIResult<Success, Failure> where Failure: Error {
+    case success(Success)
+    case failure(Failure)
+}
+
 public class MovieDBAPI {
     static func getKey() -> String {
         // Retrieve API key from Info.plist
@@ -60,7 +65,3 @@ public class APICaller {
 }
 
 
-enum APIResult<Success, Failure> where Failure: Error {
-    case success(Success)
-    case failure(Failure)
-}
