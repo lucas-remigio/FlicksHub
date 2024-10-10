@@ -22,13 +22,8 @@ struct LoginView: View {
                 .padding(.bottom, 40)
             
             Spacer()
-            
-            
-            
-            
+
             VStack {
-                
-                
                 // Username Field
                 HStack {
                     Image(systemName: "person")

@@ -5,18 +5,26 @@
 //  Created by Lucas Remigio on 05/10/2024.
 //
 import Foundation
+import FirebaseAuth
 
 class AuthenticationService {
     func login(username: String, password: String, completion: @escaping (Bool) -> Void) {
-        // Simulate a network call (e.g., 2 seconds delay)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            
-            if username == "test" && password == "password" {
-                completion(true)
-            } else {
+        // Using firebase to authenticate and retrieve the uid
+        Auth.auth().signIn(withEmail: username, password: password) { authResult, error in
+            if let error = error {
+                print("Login failed with error: \(error.localizedDescription)")
                 completion(false)
+                return
             }
+            
+            guard let user = authResult?.user else {
+                print("Login failed: No user found")
+                completion(false)
+                return
+            }
+            
+            print("Login successful. UID: \(user.uid)")
+            completion(true)
         }
     }
-    
 }
