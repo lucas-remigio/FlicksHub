@@ -28,27 +28,27 @@ struct MainView: View {
                     ForEach(viewModel.posterImageURLs!, id: \.self) { imageUrl in
                         AsyncImage(url: URL(string: imageUrl)) { phase in
                             switch phase {
-                            case .empty:
-                                ProgressView()  // Show loading spinner while image is being fetched
-                                    .frame(height: 300)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 300)
-                            case .failure:
-                                // Show an error image or placeholder if the image fails to load
-                                Image(systemName: "xmark.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 300)
-                                    .foregroundColor(.red)
-                            @unknown default:
-                                // Fallback for future cases
-                                Image(systemName: "questionmark")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 300)
+                                case .empty:
+                                    ProgressView()  // Show loading spinner while image is being fetched
+                                        .frame(height: 300)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 300)
+                                case .failure:
+                                    // Show an error image or placeholder if the image fails to load
+                                    Image(systemName: "xmark.circle")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 300)
+                                        .foregroundColor(.red)
+                                @unknown default:
+                                    // Fallback for future cases
+                                    Image(systemName: "questionmark")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 300)
                             }
                         }
                     }

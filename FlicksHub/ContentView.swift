@@ -14,8 +14,23 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 if loginViewModel.isAuthenticated {
-                    MainView()
-                        .transition(.move(edge: .trailing))  // Add the transition
+                    TabView {
+                        MainView()
+                            .tabItem {
+                                Label("Home", systemImage: "house.fill")
+                            }
+                        
+                        FavoritesView()  // Create this view for favorites
+                            .tabItem {
+                                Label("Favorites", systemImage: "star.fill")
+                            }
+                        
+                        ProfileView()  // Create this view for profile
+                            .tabItem {
+                                Label("Profile", systemImage: "person.fill")
+                            }
+                    }
+                    .transition(.move(edge: .trailing))   // Add the transition
                 } else {
                     LoginView(viewModel: loginViewModel)
                         .transition(.move(edge: .leading))  // Add the transition

@@ -9,6 +9,10 @@ import SwiftUI
 
 @main
 struct FlicksHubApp: App {
+    
+    init(){
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

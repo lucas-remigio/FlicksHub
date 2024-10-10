@@ -14,19 +14,19 @@ class MainViewModel: ObservableObject {
     func retrieveMovies() {
         APICaller.getTrendingMovies() { [weak self] result in
             switch result {
-            case .success(let movies):
-                self?.movieList = movies.results
-                
-                // Map over the movies to create full image URLs
-                self?.posterImageURLs = movies.results.compactMap { movie in
-                    if let posterPath = movie.posterPath {
-                        return "\(NetworkConstant.shared.imageServerAddress)\(posterPath)"
+                case .success(let movies):
+                    self?.movieList = movies.results
+                    
+                    // Map over the movies to create full image URLs
+                    self?.posterImageURLs = movies.results.compactMap { movie in
+                        if let posterPath = movie.posterPath {
+                            return "\(NetworkConstant.shared.imageServerAddress)\(posterPath)"
+                        }
+                        return nil  // Skip if no posterPath
                     }
-                    return nil  // Skip if no posterPath
-                }
                 
-                // For testing purposes, print the image URLs
-                print("Poster Image URLs: \(self?.posterImageURLs ?? [])")
+                    // For testing purposes, print the image URLs
+                    print("Poster Image URLs: \(self?.posterImageURLs ?? [])")
             
             case .failure(let error):
                 print("Failed to retrieve movies: \(error)")
