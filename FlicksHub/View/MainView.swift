@@ -58,11 +58,13 @@ struct MainView: View {
                 }
                 .padding()
             }
+            .scrollContentBackground(.hidden)
             .background(Color("MidnightColor"))
             .onAppear {
                 viewModel.retrieveMovies()
             }
         }
+        .navigationBarHidden(true)
     }
 }
 

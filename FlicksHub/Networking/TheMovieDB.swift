@@ -62,6 +62,22 @@ public class APICaller {
             }
         }.resume()
     }
+    
+    
+    static func getMovieDetailsById(movieId: Int, completion: @escaping (APIResult<MovieDetail, NetworkError>) -> Void ){
+        let urlString = NetworkConstant.shared.serverAddress + "movie/\(movieId)"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(MovieDBAPI.getKey())", forHTTPHeaderField: "Authorization")
+        
+        
+    }
 }
 
 
