@@ -18,46 +18,54 @@ struct MainView: View {
         ]
     
     var body: some View {
-        ScrollView {
-            if viewModel.posterImageURLs?.isEmpty ?? true {
-                Text("Loading images...")
-                    .foregroundColor(.white)
-            } else {
-                // Use LazyVGrid to display the images in a grid
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(viewModel.posterImageURLs!, id: \.self) { imageUrl in
-                        AsyncImage(url: URL(string: imageUrl)) { phase in
-                            switch phase {
-                                case .empty:
-                                    ProgressView()  // Show loading spinner while image is being fetched
-                                        .frame(height: 300)
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height: 300)
-                                case .failure:
-                                    // Show an error image or placeholder if the image fails to load
-                                    Image(systemName: "xmark.circle")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height: 300)
-                                        .foregroundColor(.red)
-                                @unknown default:
-                                    // Fallback for future cases
-                                    Image(systemName: "questionmark")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height: 300)
-                            }
+        NavigationView {
+            ScrollView {
+                if viewModel.posterImageURLs?.isEmpty ?? true {
+                    Text("Loading images...")
+                        .foregroundColor(.white)
+                } else {
+                    // Use LazyVGrid to display the images in a grid
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        // Cycle through the image urls
+                        ForEach(viewModel.posterImageURLs!, id: \.self) { imageUrl in
+                            // Link the images to the detail pages
+                            NavigationLink(destination: DetailView(imageUrl: imageUrl)){
+                                // Load the images asyncronously
+                                AsyncImage(url: URL(string: imageUrl)) { phase in
+                                    switch phase {
+                                        case .empty:
+                                            ProgressView()  // Show loading spinner while image is being fetched
+                                                .frame(height: 300)
+                                            // Success case
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(height: 300)
+                                        case .failure:
+                                            // Show an error image or placeholder if the image fails to load
+                                            Image(systemName: "xmark.circle")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(height: 300)
+                                                .foregroundColor(.red)
+                                        @unknown default:
+                                            // Fallback for future cases
+                                            Image(systemName: "questionmark")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(height: 300)
+                                    }
+                                }
+                            }.buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
             }
-        }
-        .background(Color("MidnightColor"))  // Add a blue background color to the entire scroll view
-        .onAppear {
-            viewModel.retrieveMovies()  // Fetch movies when the view appears
+            .background(Color("MidnightColor"))  // Add a blue background color to the entire scroll view
+            .onAppear {
+                viewModel.retrieveMovies()  // Fetch movies when the view appears
+            }
         }
     }
 }
