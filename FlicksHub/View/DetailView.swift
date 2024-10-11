@@ -41,69 +41,75 @@ struct DetailView: View {
             .ignoresSafeArea()  // Make background image extend under safe area
             
 
-            
-            ScrollView{
-                // Movie Title, Tagline, Genres, and Release Date
-                VStack(alignment: .leading, spacing: 8) {
-                    Spacer()
-                    Text(viewModel.movie?.title ?? "Title")
-                        .font(.title)
-                        .bold()
-                        .padding(.top)
+            GeometryReader { geometry in
+                // Scrollable Content anchored to the bottom
+                VStack {
+                    Spacer() // Pushes content to the bottom of the screen
                     
-                    Text(viewModel.movie?.tagline ?? "The world is a stage.")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                    // Genres
-                    HStack {
-                        ForEach(viewModel.movie?.genres ?? []) { genre in
-                            Text(genre.name)
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 8) {
+                            // Movie Title, Tagline, Genres, and Release Date
+                            Text(viewModel.movie?.title ?? "Title")
+                                .font(.title)
+                                .bold()
+                                .padding(.top)
+                            
+                            Text(viewModel.movie?.tagline ?? "The world is a stage.")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            
+                            // Genres
+                            HStack {
+                                ForEach(viewModel.movie?.genres ?? []) { genre in
+                                    Text(genre.name)
+                                        .font(.caption)
+                                        .padding(6)
+                                        .background(Color.blue.opacity(0.2))
+                                        .cornerRadius(8)
+                                }
+                            }
+                            
+                            Text("Release: \(viewModel.movie?.releaseDate ?? "Date")")
                                 .font(.caption)
-                                .padding(6)
-                                .background(Color.blue.opacity(0.2))
-                                .cornerRadius(8)
+                                .foregroundColor(.gray)
+                            
+                            Divider()
+                                .padding(.vertical, 8)
+                            
+                            // Rating, Popularity, Runtime
+                            HStack(spacing: 20) {
+                                Text("\(viewModel.movie?.voteAverage ?? 0.0, specifier: "%.1f") / 10")
+                                    .font(.headline)
+                                    .padding(6)
+                                    .background(Color.blue.opacity(0.2))
+                                    .cornerRadius(8)
+                                
+                                HStack(spacing: 4) {
+                                    Image(systemName: "person.fill")
+                                    Text("\(viewModel.movie?.popularity ?? 0)")
+                                        .font(.caption)
+                                }
+                                
+                                Text("\(viewModel.movie?.runtime ?? 0) min")
+                                    .font(.caption)
+                            }
+                            
+                            // Movie Overview
+                            Text(viewModel.movie?.overview ?? "Movie description here.")
+                                .font(.body)
+                                .padding(.top)
                         }
+                        .padding()
+                        .background(Color("MidnightColor").opacity(0.9))
+                        .foregroundColor(.white)
+                        .cornerRadius(15)
+                        .padding(.horizontal)
+                        .padding(.bottom, 16)
                     }
-                    
-                    Text("Release: \(viewModel.movie?.releaseDate ?? "Date")")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                    
-                    Divider()
-                        .padding(.vertical, 8)
-                    
-                    // Rating, Popularity, Runtime
-                    HStack(spacing: 20) {
-                        Text("\(viewModel.movie?.voteAverage ?? 0.0, specifier: "%.1f") / 10")
-                            .font(.headline)
-                            .padding(6)
-                            .background(Color.blue.opacity(0.2))
-                            .cornerRadius(8)
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "person.fill")
-                            Text("\(viewModel.movie?.popularity ?? 0)")
-                                .font(.caption)
-                        }
-                        
-                        Text("\(viewModel.movie?.runtime ?? 0) min")
-                            .font(.caption)
-                    }
-                    
-                    // Movie Overview
-                    Text(viewModel.movie?.overview ?? "Movie description here.")
-                        .font(.body)
-                        .padding(.top)
+                    .frame(
+                        height: (geometry.size.height / 2)
+                    ) // Allow ScrollView to take up available space
                 }
-                .padding()
-                .background(Color("MidnightColor"))
-                .foregroundColor(.white)
-                .cornerRadius(15)
-                .padding(.horizontal)
-                
-                Spacer()
-                
             }
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
