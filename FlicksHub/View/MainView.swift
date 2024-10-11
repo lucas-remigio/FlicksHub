@@ -97,21 +97,24 @@ struct MainView: View {
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(height: 300)
+                                        }
                                     }
                                 }
+                                .buttonStyle(PlainButtonStyle())
                             }
-                            .buttonStyle(PlainButtonStyle())
                         }
                     }
+                    .padding()
                 }
-                .padding()
+                .scrollContentBackground(.hidden)
             }
-            .scrollContentBackground(.hidden)
-        }
-        .background(Color("MidnightColor").edgesIgnoringSafeArea(.all))
-        .onAppear {
-            viewModel.retrieveMovies()
-        }
+            .background(Color("MidnightColor").edgesIgnoringSafeArea(.all))
+            .onAppear {
+                viewModel.retrieveMovies(filter: selectedFilter)
+            }
+            .onChange(of: selectedFilter) {
+                viewModel.retrieveMovies(filter: selectedFilter)
+            }
         }
         .navigationBarHidden(true)
     }

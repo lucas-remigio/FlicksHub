@@ -29,8 +29,8 @@ public class MovieDBAPI {
 public class APICaller {
     static let shared = APICaller()
     
-    static func getTrendingMovies(completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void) {
-        let urlString = NetworkConstant.shared.serverAddress + "/movie/popular?language=en-US&page=1"
+    static func getMovies(endpoint: String, page: Int, completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void) {
+        let urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US&page=1"
         
         // Ensure URL is valid
         guard let url = URL(string: urlString) else {
