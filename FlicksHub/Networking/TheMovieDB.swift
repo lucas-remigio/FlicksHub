@@ -64,9 +64,10 @@ public class APICaller {
     }
     
     
-    static func getMovieDetailsById(movieId: Int, completion: @escaping (APIResult<MovieDetail, NetworkError>) -> Void ){
-        let urlString = NetworkConstant.shared.serverAddress + "movie/\(movieId)"
+    static func getMovieDetailsById(movieId: Int, completion: @escaping (APIResult<MovieDetail, NetworkError>) -> Void) {
+        let urlString = NetworkConstant.shared.serverAddress + "movie/\(movieId)?language=en-US"
         
+        // Ensure URL is valid
         guard let url = URL(string: urlString) else {
             completion(.failure(.invalidURL))
             return
@@ -76,8 +77,27 @@ public class APICaller {
         request.httpMethod = "GET"
         request.setValue("Bearer \(MovieDBAPI.getKey())", forHTTPHeaderField: "Authorization")
         
-        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(.networkError(error)))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(.noData))
+                return
+            }
+            
+            do {
+                // Decode the response data into a MovieDetail object
+                let decodedResponse = try JSONDecoder().decode(MovieDetail.self, from: data)
+                completion(.success(decodedResponse))
+            } catch {
+                completion(.failure(.decodingError(error)))
+            }
+        }.resume()
     }
+
 }
 
 
