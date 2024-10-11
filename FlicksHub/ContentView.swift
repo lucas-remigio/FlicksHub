@@ -9,11 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var loginViewModel = LoginViewModel()
+    let authService = AuthenticationService()
     
     var body: some View {
         NavigationView {
             VStack {
-                if loginViewModel.isAuthenticated {
+                if authService.isUserLoggedIn(){
                     TabView {
                         MainView()
                             .tabItem {
