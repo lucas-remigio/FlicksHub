@@ -2,13 +2,15 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.ipleiria.FlicksHub</string>
+    <string>ipleiria.FlicksHub</string>
     <key>CFBundleName</key>
     <string>FlicksHub</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>
     <string>1.0</string>
+    <key>CFBundleExecutable</key>
+    <string>FlicksHub</string>
     <key>MOVIEDB_API_KEY</key>
     <string>$(MOVIEDB_API_KEY)</string> <!-- This can be linked to your .xcconfig file -->
 </dict>

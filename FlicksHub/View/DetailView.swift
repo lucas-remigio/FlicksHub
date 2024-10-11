@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DetailView: View {
     @ObservedObject var viewModel = MovieDetailViewModel()
+    @State private var contentLoaded = false
     let movieId: Int
 
     var body: some View {
@@ -106,15 +107,16 @@ struct DetailView: View {
                         .padding(.horizontal)
                         .padding(.bottom, 16)
                     }
-                    .frame(
-                        height: (geometry.size.height / 2)
-                    ) // Allow ScrollView to take up available space
+                    .frame(height: geometry.size.height / 2)  // Limit ScrollView height to the bottom half
+                    .offset(y: contentLoaded ? 0 : geometry.size.height / 2) // Start it from the bottom half
+                    .animation(.easeOut, value: contentLoaded)  // Animate based on contentLoaded state
                 }
             }
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .onAppear {
             viewModel.retrieveMovieDetails(movieId: movieId)
+            contentLoaded = true
         }
     }
 }
