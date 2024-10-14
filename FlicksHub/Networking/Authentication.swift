@@ -55,4 +55,13 @@ class AuthenticationService {
     func getSavedUID() -> String? {
         return UserDefaults.standard.string(forKey: uidKey)
     }
+    
+    // Method to retrieve current user's profile info
+    func getUserProfile(completion: @escaping (FirebaseAuth.User?) -> Void) {
+        if let user = Auth.auth().currentUser {
+            completion(user)
+        } else {
+            completion(nil)
+        }
+    }
 }
