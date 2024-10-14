@@ -9,12 +9,12 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
-    
+    @State private var isEditing = false  // Track if the edit view is presented
+
     var body: some View {
         VStack(spacing: 20) {
             // Header with back button and edit icon
             HStack {
-                
                 Text("Profile")
                     .font(.title2)
                     .fontWeight(.bold)
@@ -22,22 +22,22 @@ struct ProfileView: View {
                 Spacer()
                 
                 Button(action: {
-                    // Action for edit button
+                    isEditing = true  // Present the edit view
                 }) {
                     Image(systemName: "pencil")
                         .font(.title)
-                        .padding()                        
+                        .padding()
                 }
             }
             .foregroundColor(.white)
             .padding(.horizontal)
-            
+
             // Profile Picture
             if let profilePictureURL = viewModel.profilePictureURL {
                 AsyncImage(url: profilePictureURL) { phase in
                     switch phase {
                     case .empty:
-                        ProgressView()  // Show loading spinner while fetching the image
+                        ProgressView()
                             .frame(width: 250, height: 250)
                     case .success(let image):
                         image
@@ -48,7 +48,6 @@ struct ProfileView: View {
                             .overlay(Circle().stroke(Color.white, lineWidth: 4))
                             .shadow(radius: 10)
                     case .failure:
-                        // Display a placeholder if image fails to load
                         Image(systemName: "person.circle")
                             .resizable()
                             .scaledToFill()
@@ -69,7 +68,6 @@ struct ProfileView: View {
                     }
                 }
             } else {
-                // Placeholder image if no profile picture URL
                 Image(systemName: "person.circle")
                     .resizable()
                     .scaledToFill()
@@ -79,7 +77,7 @@ struct ProfileView: View {
                     .shadow(radius: 10)
                     .foregroundColor(.gray)
             }
-            
+
             // Username Field
             VStack(alignment: .leading, spacing: 8) {
                 Text("Username")
@@ -96,20 +94,16 @@ struct ProfileView: View {
                 .cornerRadius(10)
             }
             .padding(.horizontal)
-            
+
             Spacer()
-            
-            // Stats placeholder
-            Text("Stats")
-                .foregroundColor(.gray)
-                .font(.headline)
-            
-            Spacer()
-            
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .background(Color("MidnightColor").ignoresSafeArea())
+        .sheet(isPresented: $isEditing) {
+            ProfileEditView(viewModel: viewModel)  // Pass viewModel for editing
+        }
     }
 }
+
 
 #Preview {
     ProfileView()
