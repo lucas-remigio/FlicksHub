@@ -87,7 +87,9 @@ class ProfileViewModel: ObservableObject {
     
     // Helper function to upload profile image to Firebase Storage
     private func uploadProfileImage(_ image: UIImage, completion: @escaping (URL?) -> Void) {
-        let storageRef = Storage.storage().reference().child("profileImages/\(UUID().uuidString).jpg")
+        let storageRef = Storage.storage().reference().child(
+            "profileImages/\(authService.getSavedUID() ?? UUID().uuidString).jpg"
+        )
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(nil)
             return
