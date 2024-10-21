@@ -30,7 +30,7 @@ public class APICaller {
     static let shared = APICaller()
     
     static func getMovies(endpoint: String, page: Int, completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void) {
-        let urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US&page=1"
+        let urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US&page=\(page)"
         
         // Ensure URL is valid
         guard let url = URL(string: urlString) else {
