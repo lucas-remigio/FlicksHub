@@ -26,6 +26,7 @@ struct MainView: View {
                 TextField("Search", text: $searchText)
                     .padding(10)
                     .background(Color.white.opacity(1))
+                    .foregroundColor(Color.black)
                     .cornerRadius(8)
                     .overlay(
                         HStack {

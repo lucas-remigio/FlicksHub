@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
-    @State private var isEditing = false  // Track if the edit view is presented
 
     var body: some View {
         VStack(spacing: 20) {
@@ -22,7 +21,7 @@ struct ProfileView: View {
                 Spacer()
                 
                 Button(action: {
-                    isEditing = true  // Present the edit view
+                    viewModel.isEditing = true  // Present the edit view
                 }) {
                     Image(systemName: "pencil")
                         .font(.title)
@@ -98,7 +97,7 @@ struct ProfileView: View {
             Spacer()
         }
         .background(Color("MidnightColor").ignoresSafeArea())
-        .sheet(isPresented: $isEditing) {
+        .sheet(isPresented: $viewModel.isEditing) {
             ProfileEditView(viewModel: viewModel)  // Pass viewModel for editing
         }
     }

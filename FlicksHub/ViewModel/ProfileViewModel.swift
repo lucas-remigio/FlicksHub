@@ -14,6 +14,7 @@ class ProfileViewModel: ObservableObject {
     @Published var email: String?
     @Published var displayName: String?
     @Published var profilePictureURL: URL?
+    @Published var isEditing = false
 
 
     private let authService = AuthenticationService()
@@ -83,6 +84,8 @@ class ProfileViewModel: ObservableObject {
                 }
             }
         }
+        
+        isEditing = false
     }
     
     // Helper function to upload profile image to Firebase Storage
