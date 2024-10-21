@@ -104,6 +104,13 @@ struct MainView: View {
                                 .buttonStyle(PlainButtonStyle())
                             }
                         }
+                        // Detect the last item and load more movies
+                        if let lastMovie = viewModel.movieList.last {
+                            Text("")
+                                .onAppear {
+                                    viewModel.loadMoreMovies()
+                                }
+                        }
                     }
                     .padding()
                 }
