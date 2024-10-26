@@ -37,6 +37,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0CA045932CCD18960097CC7C /* Exceptions for "FlicksHub" folder in "FlicksHub" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0CD966682CAC60B7009AE57C /* FlicksHub */;
+		};
 		0CA4C3342CB84C5000FFA459 /* Exceptions for "FlicksHub" folder in "FlicksHubTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -57,11 +64,12 @@
 		0CD9666B2CAC60B7009AE57C /* FlicksHub */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				0CA045932CCD18960097CC7C /* Exceptions for "FlicksHub" folder in "FlicksHub" target */,
 				0CA4C3342CB84C5000FFA459 /* Exceptions for "FlicksHub" folder in "FlicksHubTests" target */,
 				0CA4C3352CB84C5000FFA459 /* Exceptions for "FlicksHub" folder in "FlicksHubUITests" target */,
 			);
 			explicitFileTypes = {
-				info.plist = text.plist.xcspec;
+				Info.plist = text.plist.xcspec;
 			};
 			path = FlicksHub;
 			sourceTree = "<group>";
@@ -365,6 +373,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = FlicksHub/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -422,6 +431,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = FlicksHub/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -443,7 +453,7 @@
 				DEVELOPMENT_TEAM = 88PT765YFB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FlicksHub/info.plist;
+				INFOPLIST_FILE = FlicksHub/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FlicksHub;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -477,7 +487,6 @@
 				DEVELOPMENT_TEAM = 88PT765YFB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FlicksHub/info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FlicksHub;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

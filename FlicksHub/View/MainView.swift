@@ -85,8 +85,8 @@ struct MainView: View {
                                         case .success(let image):
                                             image
                                                 .resizable()
-                                                .scaledToFit()
-                                                .frame(height: 300)
+                                                .scaledToFill()
+                                                .frame(height: 260)
                                         case .failure:
                                             Image(systemName: "xmark.circle")
                                                 .resizable()
@@ -101,11 +101,11 @@ struct MainView: View {
                                         }
                                     }
                                 }
-                                .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(PlainButtonStyle())
                             }
                         }
                         // Detect the last item and load more movies
-                        if let lastMovie = viewModel.movieList.last {
+                        if viewModel.movieList.last != nil {
                             Text("")
                                 .onAppear {
                                     viewModel.loadMoreMovies()

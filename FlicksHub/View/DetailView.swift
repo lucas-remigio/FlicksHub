@@ -30,11 +30,15 @@ struct DetailView: View {
                     .overlay(
                         // Apply gradient overlay for fade effect
                         LinearGradient(
-                            gradient: Gradient(colors: [Color.black.opacity(1), Color.black.opacity(0)]),
+                            gradient: Gradient(colors: [
+                                    Color.black.opacity(1),  // Start of the gradient
+                                    Color.black.opacity(0.5), // Midpoint
+                                    Color.black.opacity(0)   // End of the gradient
+                                ]),
                             startPoint: .bottom,
                             endPoint: .top
                         )
-                        .frame(height: geometry.size.height / 1.5),
+                        .frame(height: geometry.size.height / 3),
                         alignment: .bottom
                     )
                 }
@@ -101,7 +105,7 @@ struct DetailView: View {
                                 .padding(.top)
                         }
                         .padding()
-                        .background(Color("MidnightColor").opacity(0.9))
+                        .background(Color("MidnightColor").opacity(0.4))
                         .foregroundColor(.white)
                         .cornerRadius(15)
                         .padding(.horizontal)
