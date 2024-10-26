@@ -6,9 +6,11 @@
 //
 import Foundation
 import FirebaseAuth
+import SwiftUI
 
 class AuthenticationService {
     private let uidKey = "userUID"
+    @AppStorage("isUserLoggedIn") private var isUserLoggedIn: Bool = false
     
     func login(username: String, password: String, completion: @escaping (Bool) -> Void) {
         // Using firebase to authenticate and retrieve the uid
@@ -28,14 +30,9 @@ class AuthenticationService {
             // Save UID in UserDefaults
             UserDefaults.standard.set(user.uid, forKey: self.uidKey)
             print("Login successful. UID: \(user.uid)")
+            self.isUserLoggedIn = true
             completion(true)
         }
-    }
-    
-    // Method to check if the user is already logged in
-    func isUserLoggedIn() -> Bool {
-        print(getSavedUID() ?? "No UID saved")
-        return UserDefaults.standard.string(forKey: uidKey) != nil
     }
     
     // Method to log out the user and clear the UID from UserDefaults
@@ -44,6 +41,7 @@ class AuthenticationService {
             try Auth.auth().signOut()
             UserDefaults.standard.removeObject(forKey: uidKey)
             print("User logged out and UID removed from UserDefaults.")
+            self.isUserLoggedIn = false 
             completion(true)
         } catch let signOutError as NSError {
             print("Error signing out: \(signOutError.localizedDescription)")

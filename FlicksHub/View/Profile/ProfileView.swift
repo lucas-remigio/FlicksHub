@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
-
+    
     var body: some View {
         VStack(spacing: 20) {
             // Header with back button and edit icon
@@ -95,6 +95,22 @@ struct ProfileView: View {
             .padding(.horizontal)
 
             Spacer()
+            
+            Button(action: { viewModel.logout() }) {
+                Text("Logout")
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .padding()
+                    .frame(maxWidth: .infinity)  // Makes the button stretch horizontally
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: [.red, .orange]), startPoint: .leading, endPoint: .trailing)
+                    )
+                    .cornerRadius(20)
+                    .shadow(color: .red.opacity(0.4), radius: 10, x: 0, y: 5)  // Adds a subtle shadow
+            }
+            .padding(.horizontal, 100)  // Adds padding on both sides
+            .padding(.top, 20)
+            .padding(.bottom, 50)
         }
         .background(Color("MidnightColor").ignoresSafeArea())
         .sheet(isPresented: $viewModel.isEditing) {

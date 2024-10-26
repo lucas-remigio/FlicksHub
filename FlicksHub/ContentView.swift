@@ -8,13 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var loginViewModel = LoginViewModel()
-    let authService = AuthenticationService()
+    @AppStorage("isUserLoggedIn") private var isUserLoggedIn: Bool = false
     
     var body: some View {
         NavigationView {
             VStack {
-                if authService.isUserLoggedIn(){
+                if isUserLoggedIn{
                     TabView {
                         MainView()
                             .tabItem {
@@ -33,7 +32,7 @@ struct ContentView: View {
                     }
                     .transition(.move(edge: .trailing))   // Add the transition
                 } else {
-                    LoginView(viewModel: loginViewModel)
+                    LoginView()
                         .transition(.move(edge: .leading))  // Add the transition
                 }
             }

@@ -116,4 +116,12 @@ class ProfileViewModel: ObservableObject {
             }
         }
     }
+    
+    func logout() {
+        authService.logout { success in
+            if !success {
+                print("Logout failed.")
+            }
+        }
+    }
 }
