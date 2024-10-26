@@ -16,15 +16,18 @@ class RegisterViewModel: ObservableObject {
     
     private var authService = AuthenticationService()
 
-    func register() {
+    func register(completion: @escaping (Bool) -> Void) {
         if password != confirmPassword {
             errorMessage = "Passwords do not match."
+            completion(false)
             return
         }
         authService.register(username: username, password: password) { [weak self] success in
             if success {
+                completion(true)
             } else {
                 self?.errorMessage = "Invalid credentials. Please try again."
+                completion(false)
             }
         }
     }

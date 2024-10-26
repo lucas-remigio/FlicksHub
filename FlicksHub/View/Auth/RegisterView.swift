@@ -92,7 +92,12 @@ struct RegisterView: View {
                 // Login Button
                 Button(action: {
                     // Handle login action here
-                    viewModel.register()
+                    viewModel.register { success in
+                        if success {
+                            // Registration succeeded, switch back to login
+                            isRegistering = false
+                        }
+                    }
                 }) {
                     Text("Register")
                         .font(.title2)
