@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @AppStorage("isUserLoggedIn") private var isUserLoggedIn: Bool = false
+    @State private var isRegistering: Bool = false
     
     var body: some View {
         NavigationView {
@@ -32,8 +33,14 @@ struct ContentView: View {
                     }
                     .transition(.move(edge: .trailing))   // Add the transition
                 } else {
-                    LoginView()
-                        .transition(.move(edge: .leading))  // Add the transition
+                    // Switch between LoginView and RegisterView
+                    if isRegistering {
+                        RegisterView(isRegistering: $isRegistering)
+                            .transition(.move(edge: .leading))
+                    } else {
+                        LoginView(isRegistering: $isRegistering)
+                            .transition(.move(edge: .leading))
+                    }
                 }
             }
         }

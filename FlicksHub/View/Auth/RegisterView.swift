@@ -8,8 +8,9 @@
 import SwiftUI
 
 
-struct LoginView: View {
-    @ObservedObject var viewModel = LoginViewModel()
+struct RegisterView: View {
+    @Binding var isRegistering: Bool  // Passed from ContentView
+    @ObservedObject var viewModel = RegisterViewModel()
     @State private var navigateToMain = false
 
     var body: some View {
@@ -61,6 +62,25 @@ struct LoginView: View {
                 .padding(.horizontal, 30)
                 .padding(.top, 15)
                 
+                // Confirm Password Field
+                HStack {
+                    Image(systemName: "lock")
+                        .foregroundColor(.white)
+                    SecureField(
+                        "Confirm password",
+                        text: $viewModel.confirmPassword
+                    )
+                        .foregroundColor(.white)
+                }
+                .padding()
+                .background(Color("MidnightGrayColor").opacity(0.5))
+                .cornerRadius(30)
+                .overlay(
+                        RoundedRectangle(cornerRadius: 30)
+                            .stroke(Color.white, lineWidth: 1)
+                    )
+                .padding(.horizontal, 30)
+                .padding(.top, 15)
                 
                 // Error Message
                 if let errorMessage = viewModel.errorMessage {
@@ -72,9 +92,9 @@ struct LoginView: View {
                 // Login Button
                 Button(action: {
                     // Handle login action here
-                    viewModel.login()
+                    viewModel.register()
                 }) {
-                    Text("Login")
+                    Text("Register")
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -90,12 +110,12 @@ struct LoginView: View {
                 
                 // Register Link
                 HStack {
-                    Text("Don't have an account?")
+                    Text("Already have an account?")
                         .foregroundColor(.white)
                     Button(action: {
-                        // Handle register logic here
+                        isRegistering = false
                     }) {
-                        Text("Register here")
+                        Text("Login here")
                             .foregroundColor(.blue)
                             .underline()
                     }

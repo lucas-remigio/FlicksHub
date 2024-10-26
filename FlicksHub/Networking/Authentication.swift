@@ -35,6 +35,28 @@ class AuthenticationService {
         }
     }
     
+    func register(username: String, password: String, completion: @escaping (Bool) -> Void) {
+        Auth.auth().createUser(withEmail: username, password: password) { authResult, error in
+            if let error = error {
+                print("Registration failed with error: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+            
+            guard let user = authResult?.user else {
+                print("Registration failed: No user found")
+                completion(false)
+                return
+            }
+            
+            // Save UID in UserDefaults
+            UserDefaults.standard.set(user.uid, forKey: self.uidKey)
+            print("Registration successful. UID: \(user.uid)")
+            self.isUserLoggedIn = true
+            completion(true)
+        }
+    }
+    
     // Method to log out the user and clear the UID from UserDefaults
     func logout(completion: @escaping (Bool) -> Void) {
         do {

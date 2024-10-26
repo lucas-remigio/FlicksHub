@@ -8,18 +8,21 @@
 import Combine
 import SwiftUI
 
-class LoginViewModel: ObservableObject {
+class RegisterViewModel: ObservableObject {
     @Published var username: String = ""
     @Published var password: String = ""
-    @Published var isAuthenticated: Bool = false
+    @Published var confirmPassword: String = ""
     @Published var errorMessage: String?
     
     private var authService = AuthenticationService()
 
-    func login() {
-        authService.login(username: username, password: password) { [weak self] success in
+    func register() {
+        if password != confirmPassword {
+            errorMessage = "Passwords do not match."
+            return
+        }
+        authService.register(username: username, password: password) { [weak self] success in
             if success {
-                self?.isAuthenticated = true
             } else {
                 self?.errorMessage = "Invalid credentials. Please try again."
             }
