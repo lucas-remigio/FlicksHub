@@ -149,6 +149,7 @@ struct DetailView: View {
                 playlists: $playlists,
                 isCreatingPlaylist: $isCreatingPlaylist,
                 newPlaylistName: $newPlaylistName,
+                movieId: movieId,
                 onAddToPlaylist: { playlist in
                     favoritesViewModel
                         .addMovieToPlaylist(
@@ -160,7 +161,7 @@ struct DetailView: View {
                 },
                 onCreateNewPlaylist: { success in
                     if success {
-                        showPlaylistPopup = false  // Close the modal after creating a new playlist
+                        showPlaylistPopup = false // Dismiss the popup
                     }
                 }
             )

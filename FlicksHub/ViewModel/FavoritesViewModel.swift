@@ -11,10 +11,10 @@ import FirebaseAuth
 class FavoritesViewModel: ObservableObject {
     @Published var userPlaylists: [Playlist] = []  // Stores fetched playlists locally
     
-    func createPlaylist(name: String, completion: @escaping (Bool) -> Void) {
+    func createPlaylist(name: String, completion: @escaping (Bool, String?) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else {
             print("User not logged in.")
-            completion(false)
+            completion(false, nil)
             return
         }
 
@@ -28,7 +28,7 @@ class FavoritesViewModel: ObservableObject {
                 // Check for duplicate after fetching
                 if self.userPlaylists.contains(where: { $0.name == name }) {
                     print("A playlist with this name already exists.")
-                    completion(false)
+                    completion(false, nil)
                 } else {
                     // No duplicate found, proceed with playlist creation
                     self.performPlaylistCreation(name: name, userId: userId, completion: completion)
@@ -38,7 +38,7 @@ class FavoritesViewModel: ObservableObject {
             // Check for duplicate in already fetched playlists
             if userPlaylists.contains(where: { $0.name == name }) {
                 print("A playlist with this name already exists.")
-                completion(false)
+                completion(false, nil)
             } else {
                 performPlaylistCreation(name: name, userId: userId, completion: completion)
             }
@@ -46,7 +46,7 @@ class FavoritesViewModel: ObservableObject {
     }
 
     // Helper method to perform the actual creation once checks are complete
-    private func performPlaylistCreation(name: String, userId: String, completion: @escaping (Bool) -> Void) {
+    private func performPlaylistCreation(name: String, userId: String, completion: @escaping (Bool, String?) -> Void) {
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document()
 
@@ -59,7 +59,7 @@ class FavoritesViewModel: ObservableObject {
         playlistRef.setData(data) { error in
             if let error = error {
                 print("Failed to create playlist: \(error.localizedDescription)")
-                completion(false)
+                completion(false, nil)
             } else {
                 print("Playlist created successfully with ID \(playlistRef.documentID)")
                 // Optionally, add the new playlist to the local list
@@ -72,7 +72,7 @@ class FavoritesViewModel: ObservableObject {
                             movies: []
                         )
                     )
-                completion(true)
+                completion(true, playlistRef.documentID)
             }
         }
     }
@@ -113,8 +113,6 @@ class FavoritesViewModel: ObservableObject {
                         try? doc.data(as: Playlist.self)
                     }
                     self.userPlaylists = playlists ?? []
-                    print(playlists)
-                    print(self.userPlaylists)
                     completion(playlists)
                 }
             }

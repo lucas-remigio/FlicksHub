@@ -14,6 +14,7 @@ struct PlaylistSelectionView: View {
     @Binding var playlists: [Playlist]
     @Binding var isCreatingPlaylist: Bool
     @Binding var newPlaylistName: String
+    let movieId: Int?
     @State private var errorMessage: String?
     var onAddToPlaylist: (Playlist) -> Void
     var onCreateNewPlaylist: (Bool) -> Void
@@ -49,15 +50,20 @@ struct PlaylistSelectionView: View {
                     .padding()
 
                 Button(action: {
-                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success in
+                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success, playlistId in
                         if success {
-                            // Refresh playlists after creation
-                            favoritesViewModel.fetchUserPlaylists { fetchedPlaylists in
-                                playlists = fetchedPlaylists ?? []
-                                newPlaylistName = ""  // Clear the text field
-                                isCreatingPlaylist = false  // Exit creation mode
-                                onCreateNewPlaylist(true)  // Emit event to close modal
-                            }
+                            // add movie to playlist created
+                            favoritesViewModel
+                                .addMovieToPlaylist(
+                                    playlistId: playlistId ?? "",
+                                    movieId: movieId ?? 0
+                                ) { success in
+                                       
+                                    }
+                                                       
+                            isCreatingPlaylist = false  // Exit creation mode
+                            onCreateNewPlaylist(true)  // Emit event to close modal
+                            
                         } else {
                             errorMessage = "A playlist with this name already exists."
                             onCreateNewPlaylist(false)
