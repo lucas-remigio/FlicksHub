@@ -123,7 +123,7 @@ struct DetailView: View {
                 }
             }
         }
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .background(Color("MidnightColor").edgesIgnoringSafeArea(.all))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
@@ -156,6 +156,7 @@ struct DetailView: View {
                             movieId: movieId) { success in
                                
                             }
+                    showPlaylistPopup = false // Dismiss the popup
                 },
                 onCreateNewPlaylist: {
                     favoritesViewModel.createPlaylist(name: newPlaylistName) { success in
