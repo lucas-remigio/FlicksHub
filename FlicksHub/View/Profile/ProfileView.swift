@@ -35,7 +35,9 @@ struct ProfileView: View {
             if viewModel.isLoadingUpdatedProfile {
                 ProgressView("Updating profile...")
                     .padding()
-                    .background(Color("AccentColor").ignoresSafeArea())
+                    .background(
+                        Color("AccentColor").opacity(0.5).ignoresSafeArea()
+                    )
                     .cornerRadius(10)
                     .shadow(radius: 10)
                     .foregroundColor(.white)

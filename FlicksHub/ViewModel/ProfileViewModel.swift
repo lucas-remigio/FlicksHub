@@ -35,8 +35,8 @@ class ProfileViewModel: ObservableObject {
                 self.displayName = user.displayName
                 self.profilePictureURL = user.photoURL
                 print(self.profilePictureURL ?? "nothing")
-                print(self.email != nil ?? "No email")
-                print(self.displayName != nil ?? "No display name")
+                print(self.email ?? "No email")
+                print(self.displayName ?? "No display name")
                 print(self.profilePictureURL ?? "No profile picture")
             }
         }
