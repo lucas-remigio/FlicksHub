@@ -32,24 +32,16 @@ struct FavoritesView: View {
                     ScrollView {
                         VStack(spacing: 15) {
                             ForEach(playlists) { playlist in
-                                Button(action: {
-                                    selectedPlaylist = playlist
-                                    showMovieList = true
-                                }) {
-                                    HStack {
-                                        Text(playlist.name)
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                        Spacer()
-                                        Text("\(playlist.movies.count) movies")
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
+                                PlaylistRow(
+                                    playlist: playlist,
+                                    onSelect: {
+                                        selectedPlaylist = playlist
+                                        showMovieList = true
+                                    },
+                                    onDelete: {
+                                        deletePlaylist(with: playlist.id ?? "")
                                     }
-                                    .padding()
-                                    .background(Color("MidnightGrayColor").opacity(0.9))
-                                    .cornerRadius(12)
-                                }
-                                .padding(.horizontal)
+                                )
                             }
                         }
                         .padding(.top)
@@ -66,7 +58,7 @@ struct FavoritesView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showMovieList) {
                 if let playlist = selectedPlaylist {
-                    MovieListView(playlist: playlist)
+                    FavoriteDetailView(playlist: playlist)
                 }
             }
         }
@@ -77,44 +69,23 @@ struct FavoritesView: View {
             self.playlists = fetchedPlaylists ?? []
         }
     }
-}
-
-struct MovieListView: View {
-    var playlist: Playlist
     
-    var body: some View {
-        VStack {
-            Text(playlist.name)
-                .font(.title2)
-                .fontWeight(.bold)
-                .padding()
-                .foregroundColor(.white)
-            
-            if playlist.movies.isEmpty {
-                Text("No movies in this playlist.")
-                    .foregroundColor(.gray)
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .center)
-            } else {
-                ScrollView {
-                    VStack(spacing: 15) {
-                        ForEach(playlist.movies, id: \.self) { movieId in
-                            Text("Movie ID: \(movieId)")
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color("MidnightGrayColor").opacity(0.9))
-                                .cornerRadius(12)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                        }
-                    }
+    private func deletePlaylist(with playlistId: String) {
+        // Call the delete function on the view model
+        favoritesViewModel.deletePlaylist(playlistId: playlistId) { success in
+            if success {
+                // Find the index of the playlist with the specified ID
+                if let index = playlists.firstIndex(where: { $0.id == playlistId }) {
+                    playlists.remove(at: index)  // Remove playlist from local list
                 }
+            } else {
+                print("Failed to delete playlist.")
             }
-            Spacer()
         }
-        .background(Color("MidnightColor").ignoresSafeArea())
     }
 }
+
+
 
 #Preview {
     FavoritesView()
