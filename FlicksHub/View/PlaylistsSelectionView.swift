@@ -14,8 +14,11 @@ struct PlaylistSelectionView: View {
     @Binding var playlists: [Playlist]
     @Binding var isCreatingPlaylist: Bool
     @Binding var newPlaylistName: String
+    @State private var errorMessage: String?
     var onAddToPlaylist: (Playlist) -> Void
-    var onCreateNewPlaylist: () -> Void
+    var onCreateNewPlaylist: (Bool) -> Void
+    
+    @ObservedObject var favoritesViewModel = FavoritesViewModel()
 
     var body: some View {
         VStack(spacing: 20) {
@@ -30,7 +33,8 @@ struct PlaylistSelectionView: View {
                             Text(playlist.name)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color.blue.opacity(0.2))
+                                .background(Color("MidnightGrayColor"))
+                                .foregroundColor(Color.white)
                                 .cornerRadius(8)
                         }
                     }
@@ -44,20 +48,42 @@ struct PlaylistSelectionView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
 
-                Button(action: onCreateNewPlaylist) {
+                Button(action: {
+                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success in
+                        if success {
+                            // Refresh playlists after creation
+                            favoritesViewModel.fetchUserPlaylists { fetchedPlaylists in
+                                playlists = fetchedPlaylists ?? []
+                                newPlaylistName = ""  // Clear the text field
+                                isCreatingPlaylist = false  // Exit creation mode
+                                onCreateNewPlaylist(true)  // Emit event to close modal
+                            }
+                        } else {
+                            errorMessage = "A playlist with this name already exists."
+                            onCreateNewPlaylist(false)
+                        }
+                    }
+                }) {
                     Text("Create Playlist")
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.green)
+                        .background(Color("AccentColor"))
                         .foregroundColor(.white)
                         .cornerRadius(8)
+                }
+                
+                // Show error message if present
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding(.top, 5)
                 }
             } else {
                 Button(action: { isCreatingPlaylist = true }) {
                     Text("Create New Playlist")
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.gray.opacity(0.3))
+                        .background(Color("MidnightGrayColor"))
                         .cornerRadius(8)
                 }
             }
@@ -65,9 +91,12 @@ struct PlaylistSelectionView: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(Color.black.opacity(0))
         .cornerRadius(20)
         .padding()
         .shadow(radius: 10)
+        .onDisappear {
+            isCreatingPlaylist = false
+        }
     }
 }

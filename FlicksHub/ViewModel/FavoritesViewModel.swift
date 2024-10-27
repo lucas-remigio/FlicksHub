@@ -9,28 +9,69 @@ import FirebaseFirestore
 import FirebaseAuth
 
 class FavoritesViewModel: ObservableObject {
+    @Published var userPlaylists: [Playlist] = []  // Stores fetched playlists locally
+    
     func createPlaylist(name: String, completion: @escaping (Bool) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else {
             print("User not logged in.")
             completion(false)
             return
         }
-        
+
+        // If userPlaylists is empty, fetch playlists before creating
+        if userPlaylists.isEmpty {
+            fetchUserPlaylists { [weak self] fetchedPlaylists in
+                guard let self = self else { return }
+                
+                self.userPlaylists = fetchedPlaylists ?? []
+
+                // Check for duplicate after fetching
+                if self.userPlaylists.contains(where: { $0.name == name }) {
+                    print("A playlist with this name already exists.")
+                    completion(false)
+                } else {
+                    // No duplicate found, proceed with playlist creation
+                    self.performPlaylistCreation(name: name, userId: userId, completion: completion)
+                }
+            }
+        } else {
+            // Check for duplicate in already fetched playlists
+            if userPlaylists.contains(where: { $0.name == name }) {
+                print("A playlist with this name already exists.")
+                completion(false)
+            } else {
+                performPlaylistCreation(name: name, userId: userId, completion: completion)
+            }
+        }
+    }
+
+    // Helper method to perform the actual creation once checks are complete
+    private func performPlaylistCreation(name: String, userId: String, completion: @escaping (Bool) -> Void) {
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document()
-        
+
         let data: [String: Any] = [
             "userId": userId,
             "name": name,
             "movies": []
         ]
-        
+
         playlistRef.setData(data) { error in
             if let error = error {
                 print("Failed to create playlist: \(error.localizedDescription)")
                 completion(false)
             } else {
                 print("Playlist created successfully with ID \(playlistRef.documentID)")
+                // Optionally, add the new playlist to the local list
+                self.userPlaylists
+                    .append(
+                        Playlist(
+                            id: playlistRef.documentID,
+                            userId: Auth.auth().currentUser?.uid ?? "",
+                            name: name,
+                            movies: []
+                        )
+                    )
                 completion(true)
             }
         }
@@ -71,6 +112,9 @@ class FavoritesViewModel: ObservableObject {
                     let playlists = snapshot?.documents.compactMap { doc -> Playlist? in
                         try? doc.data(as: Playlist.self)
                     }
+                    self.userPlaylists = playlists ?? []
+                    print(playlists)
+                    print(self.userPlaylists)
                     completion(playlists)
                 }
             }

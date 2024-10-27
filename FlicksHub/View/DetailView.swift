@@ -158,19 +158,9 @@ struct DetailView: View {
                             }
                     showPlaylistPopup = false // Dismiss the popup
                 },
-                onCreateNewPlaylist: {
-                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success in
-                        if success {
-                            favoritesViewModel.fetchUserPlaylists(completion: {fetchedPlaylists in
-                                let playlists = fetchedPlaylists ?? []
-                                self.playlists = playlists
-                            })     // Refresh playlists after creation
-                            newPlaylistName = ""     // Clear the text field
-                            isCreatingPlaylist = false // Close the creation field
-                            showPlaylistPopup = false // Dismiss the popup
-                        } else {
-                            // Handle error if needed
-                        }
+                onCreateNewPlaylist: { success in
+                    if success {
+                        showPlaylistPopup = false  // Close the modal after creating a new playlist
                     }
                 }
             )
