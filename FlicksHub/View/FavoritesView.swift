@@ -29,23 +29,28 @@ struct FavoritesView: View {
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .center)
                 } else {
-                    ScrollView {
-                        VStack(spacing: 15) {
-                            ForEach(playlists) { playlist in
-                                PlaylistRow(
-                                    playlist: playlist,
-                                    onSelect: {
-                                        selectedPlaylist = playlist
-                                        showMovieList = true
-                                    },
-                                    onDelete: {
-                                        deletePlaylist(with: playlist.id ?? "")
-                                    }
-                                )
+                    List {
+                        ForEach(playlists) { playlist in
+                            PlaylistRow(
+                                playlist: playlist,
+                                onSelect: {
+                                    selectedPlaylist = playlist
+                                    showMovieList = true
+                                },
+                                onDelete: {
+                                    deletePlaylist(with: playlist.id ?? "")
+                                }
+                            ).swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button(role: .destructive) {
+                                    deletePlaylist(with: playlist.id ?? "")
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
                         }
-                        .padding(.top)
+                        .listRowBackground(Color("MidnightColor").opacity(1))  // Ensure consistent background
                     }
+                    .listStyle(PlainListStyle())
                 }
                 
                 Spacer()

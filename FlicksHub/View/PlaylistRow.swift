@@ -26,11 +26,6 @@ struct PlaylistRow: View {
             .padding()
             .background(Color("MidnightGrayColor").opacity(0.9))
             .cornerRadius(12)
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                Button(role: .destructive, action: onDelete) {
-                    Label("Delete", systemImage: "trash")
-                }
-            }
         }
         .padding(.horizontal)
     }
