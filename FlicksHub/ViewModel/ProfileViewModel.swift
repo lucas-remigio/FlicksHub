@@ -15,6 +15,7 @@ class ProfileViewModel: ObservableObject {
     @Published var displayName: String?
     @Published var profilePictureURL: URL?
     @Published var isEditing = false
+    @Published var isLoadingUpdatedProfile: Bool = false
 
 
     private let authService = AuthenticationService()
@@ -33,6 +34,7 @@ class ProfileViewModel: ObservableObject {
                 self.email = user.email
                 self.displayName = user.displayName
                 self.profilePictureURL = user.photoURL
+                print(self.profilePictureURL ?? "nothing")
                 print(self.email != nil ?? "No email")
                 print(self.displayName != nil ?? "No display name")
                 print(self.profilePictureURL ?? "No profile picture")
@@ -43,6 +45,8 @@ class ProfileViewModel: ObservableObject {
     // Update profile with new display name and profile picture
     func updateProfile(displayName: String, profileImage: UIImage?) {
         guard let user = Auth.auth().currentUser else { return }
+        
+        isLoadingUpdatedProfile = true
         
         // Update display name in Firebase
         let changeRequest = user.createProfileChangeRequest()
@@ -67,6 +71,7 @@ class ProfileViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         self.displayName = displayName
                         self.profilePictureURL = url
+                        self.isLoadingUpdatedProfile = false
                     }
                 }
             }
@@ -81,6 +86,7 @@ class ProfileViewModel: ObservableObject {
                 // Update local display name on success
                 DispatchQueue.main.async {
                     self?.displayName = displayName
+                    self?.isLoadingUpdatedProfile = false
                 }
             }
         }

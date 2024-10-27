@@ -35,34 +35,34 @@ struct ProfileEditView: View {
                 } else {
                     AsyncImage(url: viewModel.profilePictureURL) { phase in
                         switch phase {
-                        case .empty:
-                            ProgressView().frame(width: 150, height: 150)
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 150, height: 150)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                                .shadow(radius: 10)
-                        case .failure:
-                            Image(systemName: "person.circle")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 150, height: 150)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                                .shadow(radius: 10)
-                                .foregroundColor(.gray)
-                        @unknown default:
-                            Image(systemName: "person.circle")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 150, height: 150)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                                .shadow(radius: 10)
-                                .foregroundColor(.gray)
+                            case .empty:
+                                ProgressView().frame(width: 150, height: 150)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 150, height: 150)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                    .shadow(radius: 10)
+                            case .failure:
+                                Image(systemName: "person.circle")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 150, height: 150)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                    .shadow(radius: 10)
+                                    .foregroundColor(.gray)
+                            @unknown default:
+                                Image(systemName: "person.circle")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 150, height: 150)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                    .shadow(radius: 10)
+                                    .foregroundColor(.gray)
                         }
                     }
                 }

@@ -30,40 +30,50 @@ struct ProfileView: View {
             }
             .foregroundColor(.white)
             .padding(.horizontal)
+            
+            // Show loading icon when updating profile
+            if viewModel.isLoadingUpdatedProfile {
+                ProgressView("Updating profile...")
+                    .padding()
+                    .background(Color("AccentColor").ignoresSafeArea())
+                    .cornerRadius(10)
+                    .shadow(radius: 10)
+                    .foregroundColor(.white)
+            }
 
             // Profile Picture
             if let profilePictureURL = viewModel.profilePictureURL {
                 AsyncImage(url: profilePictureURL) { phase in
                     switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(width: 250, height: 250)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 250, height: 250)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                            .shadow(radius: 10)
-                    case .failure:
-                        Image(systemName: "person.circle")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 250, height: 250)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                            .shadow(radius: 10)
-                            .foregroundColor(.gray)
-                    @unknown default:
-                        Image(systemName: "person.circle")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 250, height: 250)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                            .shadow(radius: 10)
-                            .foregroundColor(.gray)
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 250, height: 250)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 250, height: 250)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                .shadow(radius: 10)
+                        case .failure:
+                            Image(systemName: "person.circle")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 250, height: 250)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                .shadow(radius: 10)
+                                .foregroundColor(.gray)
+                        @unknown default:
+                            Image(systemName: "person.circle")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 250, height: 250)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                                .shadow(radius: 10)
+                                .foregroundColor(.gray)
                     }
                 }
             } else {
