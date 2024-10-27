@@ -27,4 +27,7 @@ class MovieDetailViewModel: ObservableObject {
             }
         }
     }
+    
+    func addToFavorites(movieId: Int) {
+    }
 }

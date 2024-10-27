@@ -9,8 +9,14 @@ import SwiftUI
 
 struct DetailView: View {
     @ObservedObject var viewModel = MovieDetailViewModel()
+    @ObservedObject var favoritesViewModel = FavoritesViewModel()
     @State private var contentLoaded = false
     let movieId: Int
+    @State private var isFavorite: Bool = false
+    @State private var showPlaylistPopup: Bool = false  // Controls the popup visibility
+    @State private var playlists: [Playlist] = []       // Stores user playlists
+    @State private var newPlaylistName: String = ""     // For creating a new playlist
+    @State private var isCreatingPlaylist: Bool = false // To show/hide new playlist text field
 
     var body: some View {
         ZStack {
@@ -118,9 +124,55 @@ struct DetailView: View {
             }
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showPlaylistPopup = true  // Toggle favorite state
+                    // Add logic here to save or remove from favorites
+                }) {
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .font(.title2)
+                        .foregroundColor(isFavorite ? Color("AccentColor") : .white)
+                }
+            }
+        }
         .onAppear {
             viewModel.retrieveMovieDetails(movieId: movieId)
             contentLoaded = true
+            favoritesViewModel.fetchUserPlaylists(completion: {fetchedPlaylists in
+                let playlists = fetchedPlaylists ?? []
+                self.playlists = playlists
+            })
+        }
+        .sheet(isPresented: $showPlaylistPopup) {
+            PlaylistSelectionView(
+                playlists: $playlists,
+                isCreatingPlaylist: $isCreatingPlaylist,
+                newPlaylistName: $newPlaylistName,
+                onAddToPlaylist: { playlist in
+                    favoritesViewModel
+                        .addMovieToPlaylist(
+                            playlistId: playlist.id ?? "",
+                            movieId: movieId) { success in
+                               
+                            }
+                },
+                onCreateNewPlaylist: {
+                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success in
+                        if success {
+                            favoritesViewModel.fetchUserPlaylists(completion: {fetchedPlaylists in
+                                let playlists = fetchedPlaylists ?? []
+                                self.playlists = playlists
+                            })     // Refresh playlists after creation
+                            newPlaylistName = ""     // Clear the text field
+                            isCreatingPlaylist = false // Close the creation field
+                            showPlaylistPopup = false // Dismiss the popup
+                        } else {
+                            // Handle error if needed
+                        }
+                    }
+                }
+            )
         }
     }
 }
