@@ -20,7 +20,8 @@ struct MainView: View {
     ]
     
     var body: some View {
-        NavigationView {VStack(alignment: .leading) {
+        NavigationView {
+            VStack(alignment: .leading) {
             // Search bar
             HStack {
                 TextField("Search", text: $searchText)
@@ -45,10 +46,7 @@ struct MainView: View {
                 Text(selectedFilter)
                     .font(.title2)
                     .fontWeight(.bold)
-                    .padding(.horizontal)
-                    .padding(.top, 5)
                     .foregroundColor(.white)
-                    
                 
                 Spacer()
                 
@@ -62,11 +60,11 @@ struct MainView: View {
                     Label("Filter by", systemImage: "arrowtriangle.down.fill")
                         .font(.caption)
                         .padding(10)
-                        .background(Color.white.opacity(0.15))
+                        .background(Color("MidnightGrayColor"))
                         .cornerRadius(8)
                         .fontWeight(.bold)
                 }
-            }.padding(10)
+            }.padding([.horizontal])
             
             // Scrollable grid of movies
             ScrollView {

@@ -91,7 +91,7 @@ struct DetailView: View {
                                 
                                 HStack(spacing: 4) {
                                     Image(systemName: "person.fill")
-                                    Text("\(viewModel.movie?.popularity ?? 0)")
+                                    Text("\(viewModel.movie?.voteCount ?? 0)")
                                         .font(.caption)
                                 }
                                 
