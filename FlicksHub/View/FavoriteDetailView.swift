@@ -43,7 +43,7 @@ struct FavoriteDetailView: View {
                     MovieRowView(movie: movie)
                 }
                 .buttonStyle(PlainButtonStyle())  // Prevents default button styling interference
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         deleteMovieFromPlaylist(movieId: movie.id)
                     } label: {
