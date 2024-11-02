@@ -26,6 +26,7 @@ struct PlaylistSelectionView: View {
             Text("Add to Playlist")
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundColor(Color.white)
 
             ScrollView {
                 VStack(spacing: 10) {
@@ -97,7 +98,7 @@ struct PlaylistSelectionView: View {
             Spacer()
         }
         .padding()
-        .background(Color.black.opacity(0))
+        .background(Color("MidnightColor"))
         .cornerRadius(20)
         .padding()
         .shadow(radius: 10)

@@ -1,17 +1,8 @@
-//
-//  FavoritesView.swift
-//  FlicksHub
-//
-//  Created by Lucas Remigio on 10/10/2024.
-//
-
 import SwiftUI
 
 struct FavoritesView: View {
     @ObservedObject private var favoritesViewModel = FavoritesViewModel()
     @State private var playlists: [Playlist] = []  // Stores user playlists
-    @State private var selectedPlaylist: Playlist?  // Currently selected playlist
-    @State private var showMovieList = false  // Toggles movie list view for selected playlist
     
     var body: some View {
         NavigationView {
@@ -31,24 +22,23 @@ struct FavoritesView: View {
                 } else {
                     List {
                         ForEach(playlists) { playlist in
-                            PlaylistRow(
-                                playlist: playlist,
-                                onSelect: {
-                                    selectedPlaylist = playlist
-                                    showMovieList = true
-                                },
-                                onDelete: {
-                                    deletePlaylist(with: playlist.id ?? "")
-                                }
-                            ).swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            NavigationLink(destination: FavoriteDetailView(playlist: playlist)) {
+                                PlaylistRow(
+                                    playlist: playlist,
+                                    onDelete: {
+                                        deletePlaylist(with: playlist.id ?? "")
+                                    }
+                                )
+                            }.buttonStyle(PlainButtonStyle())
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
                                     deletePlaylist(with: playlist.id ?? "")
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
                             }
+                            .listRowBackground(Color("MidnightColor").opacity(1))  // Ensure consistent background
                         }
-                        .listRowBackground(Color("MidnightColor").opacity(1))  // Ensure consistent background
                     }
                     .listStyle(PlainListStyle())
                 }
@@ -61,11 +51,7 @@ struct FavoritesView: View {
             }
             .navigationTitle("Favorites")
             .navigationBarHidden(true)
-            .sheet(isPresented: $showMovieList) {
-                if let playlist = selectedPlaylist {
-                    FavoriteDetailView(playlist: playlist)
-                }
-            }
+            .background(Color("MidnightColor"))
         }
     }
     
@@ -89,8 +75,6 @@ struct FavoritesView: View {
         }
     }
 }
-
-
 
 #Preview {
     FavoritesView()

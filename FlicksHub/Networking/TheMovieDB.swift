@@ -64,6 +64,7 @@ public class APICaller {
     }
     
     
+    
     static func getMovieDetailsById(movieId: Int, completion: @escaping (APIResult<MovieDetail, NetworkError>) -> Void) {
         let urlString = NetworkConstant.shared.serverAddress + "movie/\(movieId)?language=en-US"
         
@@ -96,6 +97,37 @@ public class APICaller {
                 completion(.failure(.decodingError(error)))
             }
         }.resume()
+    }
+    
+    
+    static func getMoviesByIds(movieIds: [Int], completion: @escaping (APIResult<[MovieDetail], NetworkError>) -> Void) {
+        var movies: [MovieDetail] = []
+        let dispatchGroup = DispatchGroup()
+        
+        for movieId in movieIds {
+            dispatchGroup.enter()
+            
+            // Fetch each movie detail by its ID
+            getMovieDetailsById(movieId: movieId) { result in
+                switch result {
+                case .success(let movieDetail):
+                    movies.append(movieDetail)
+                case .failure(let error):
+                    print("Error fetching movie ID \(movieId): \(error)")
+                }
+                
+                dispatchGroup.leave()
+            }
+        }
+        
+        // Notify once all requests are completed
+        dispatchGroup.notify(queue: .main) {
+            if movies.isEmpty {
+                completion(.failure(.noData))  // Handle case when no movies are fetched
+            } else {
+                completion(.success(movies))
+            }
+        }
     }
 
 }

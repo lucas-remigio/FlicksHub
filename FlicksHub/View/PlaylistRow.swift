@@ -9,25 +9,21 @@ import SwiftUI
 
 struct PlaylistRow: View {
     let playlist: Playlist
-    let onSelect: () -> Void
     let onDelete: () -> Void
 
     var body: some View {
-        Button(action: onSelect) {
-            HStack {
-                Text(playlist.name)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                Spacer()
-                Text("\(playlist.movies.count) movies")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-            .padding()
-            .background(Color("MidnightGrayColor").opacity(0.9))
-            .cornerRadius(12)
+        HStack {
+            Text(playlist.name)
+                .font(.headline)
+                .foregroundColor(.white)
+            Spacer()
+            Text("\(playlist.movies.count) movies")
+                .font(.subheadline)
+                .foregroundColor(.gray)
         }
-        .padding(.horizontal)
+        .padding()
+        .background(Color("MidnightGrayColor").opacity(0.9))
+        .cornerRadius(12)
     }
 }
 
@@ -41,5 +37,5 @@ struct PlaylistRow: View {
             )
         }
     
-    PlaylistRow(playlist: samplePlaylist, onSelect: {}, onDelete: {})
+    PlaylistRow(playlist: samplePlaylist, onDelete: {})
 }

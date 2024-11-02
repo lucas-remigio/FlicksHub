@@ -10,6 +10,34 @@ import FirebaseAuth
 
 class FavoritesViewModel: ObservableObject {
     @Published var userPlaylists: [Playlist] = []  // Stores fetched playlists locally
+    @Published var movies: [MovieDetail] = []  // Stores movie details for the current playlist
+    
+    // Fetch movies based on their IDs
+    func fetchMovies(for movieIds: [Int], completion: @escaping () -> Void) {
+        self.movies = []  // Clear movies list to show loading state
+        let group = DispatchGroup()
+        
+        var fetchedMovies: [MovieDetail] = []
+        
+        for movieId in movieIds {
+            group.enter()
+            APICaller.getMovieDetailsById(movieId: movieId) { result in
+                defer { group.leave() }
+                
+                switch result {
+                case .success(let movieDetail):
+                    fetchedMovies.append(movieDetail) // Assume Movie can be initialized from MovieDetail
+                case .failure(let error):
+                    print("Failed to fetch movie \(movieId): \(error)")
+                }
+            }
+        }
+        
+        group.notify(queue: .main) {
+            self.movies = fetchedMovies
+            completion()  // Notify that fetching is complete
+        }
+    }
     
     func createPlaylist(name: String, completion: @escaping (Bool, String?) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else {

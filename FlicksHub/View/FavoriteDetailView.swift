@@ -7,49 +7,51 @@
 
 import SwiftUI
 
-
 struct FavoriteDetailView: View {
     var playlist: Playlist
+    @ObservedObject private var viewModel = FavoritesViewModel()
+    @State private var isLoading = true  // Track loading state
     
     var body: some View {
-        VStack {
-            Text(playlist.name)
-                .font(.title2)
-                .fontWeight(.bold)
-                .padding()
-                .foregroundColor(.white)
-            
-            if playlist.movies.isEmpty {
-                Text("No movies in this playlist.")
-                    .foregroundColor(.gray)
+            VStack {
+                Text(playlist.name)
+                    .font(.title2)
+                    .fontWeight(.bold)
                     .padding()
-                    .frame(maxWidth: .infinity, alignment: .center)
-            } else {
-                List {
-                    ForEach(playlist.movies, id: \.self) { movieId in
-                        HStack {
-                            Text("Movie ID: \(movieId)")
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color("MidnightGrayColor").opacity(0.9))
-                                .cornerRadius(12)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            
+                    .foregroundColor(.white)
+                
+                if isLoading {
+                    ProgressView("Loading movies...")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else if viewModel.movies.isEmpty {
+                    Text("No movies in this playlist.")
+                        .foregroundColor(.gray)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                } else {
+                    List {
+                        ForEach(viewModel.movies, id: \.id) { movie in
+                            NavigationLink(destination: DetailView(movieId: movie.id)) {
+                                MovieRowView(movie: movie)
+                            }
+                            .buttonStyle(PlainButtonStyle())  // Prevents default button styling interference
                         }
-                        .padding(.horizontal)
-                        .background(Color("MidnightGrayColor").opacity(0.1))
-                        .cornerRadius(12)
                     }
+                    .listStyle(PlainListStyle())
+                    .background(Color("MidnightColor").edgesIgnoringSafeArea(.all))
                 }
-                .listStyle(PlainListStyle())  // Adjust styling for a cleaner look
-                .background(Color("MidnightColor"))
+                
+                Spacer()
             }
-            Spacer()
+            .background(Color("MidnightColor").ignoresSafeArea())
+            .onAppear {
+                viewModel.fetchMovies(for: playlist.movies) {
+                    isLoading = false  // Set loading state to false once movies are loaded
+                }
+            }
         }
-        .background(Color("MidnightColor").ignoresSafeArea())
-    }
 }
-
 
 #Preview {
     var samplePlaylist: Playlist {

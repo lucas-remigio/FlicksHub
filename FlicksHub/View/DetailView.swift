@@ -37,9 +37,9 @@ struct DetailView: View {
                         // Apply gradient overlay for fade effect
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                    Color.black.opacity(1),  // Start of the gradient
-                                    Color.black.opacity(0.5), // Midpoint
-                                    Color.black.opacity(0)   // End of the gradient
+                                    Color("MidnightColor").opacity(1),  // Start of the gradient
+                                    Color("MidnightColor").opacity(0.5), // Midpoint
+                                    Color("MidnightColor").opacity(0)   // End of the gradient
                                 ]),
                             startPoint: .bottom,
                             endPoint: .top
@@ -162,9 +162,10 @@ struct DetailView: View {
                 onCreateNewPlaylist: { success in
                     if success {
                         showPlaylistPopup = false // Dismiss the popup
+                        newPlaylistName = ""
                     }
                 }
-            )
+            ).background(Color("MidnightColor"))
         }
     }
 }
