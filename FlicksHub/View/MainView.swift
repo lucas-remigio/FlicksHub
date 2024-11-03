@@ -23,23 +23,26 @@ struct MainView: View {
         NavigationView {
             VStack(alignment: .leading) {
             // Search bar
-            HStack {
-                TextField("Search", text: $searchText)
-                    .padding(10)
-                    .background(Color.white.opacity(1))
-                    .foregroundColor(Color.black)
-                    .cornerRadius(8)
-                    .overlay(
-                        HStack {
-                            Spacer()
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(Color.accentColor)
-                                .padding(.trailing, 10)
-                        }
-                    )
-
-            }
-            .padding([.horizontal, .top])
+                HStack {
+                    NavigationLink(
+                        destination: SearchView()
+                    ) {
+                        TextField("Search", text: $searchText)
+                        .padding(10)
+                        .background(Color.white.opacity(1))
+                        .foregroundColor(Color.black)
+                        .cornerRadius(8)
+                        .overlay(
+                            HStack {
+                                Spacer()
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(Color.accentColor)
+                                    .padding(.trailing, 10)
+                            }
+                        )
+                    }
+                }
+                .padding([.horizontal, .top])
             
             HStack{
                 // "Trending" text
@@ -125,6 +128,9 @@ struct MainView: View {
         .navigationBarHidden(true)
     }
 }
+
+
+
 
 #Preview {
     MainView()

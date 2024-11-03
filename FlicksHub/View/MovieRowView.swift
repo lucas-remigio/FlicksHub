@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MovieRowView: View {
-    let movie: MovieDetail
+    let movie: MovieProtocol
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

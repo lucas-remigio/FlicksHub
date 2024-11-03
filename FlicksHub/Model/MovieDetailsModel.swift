@@ -73,6 +73,10 @@ struct Genre: Codable, Identifiable {
     let name: String
 }
 
+struct GenreResponse: Codable {
+    let genres: [Genre]
+}
+
 // MARK: - ProductionCompany
 struct ProductionCompany: Codable, Identifiable {
     let id: Int

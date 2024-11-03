@@ -25,32 +25,35 @@ class MainViewModel: ObservableObject {
                 endpoint = "/movie/popular"  // Default to popular if filter is unknown
         }
         
-        APICaller.getMovies(endpoint: endpoint, page: page) { [weak self] result in
-            switch result {
-                case .success(let movies):
-                    DispatchQueue.main.async {
-                        guard let self = self else { return }
-                        
-                        self.totalPages = movies.totalPages  // Store total number of pages
+        // Create query parameters dictionary
+        let queryParams: [String: String] = ["page": "\(page)"]
+        
+        APICaller.getMovies(endpoint: endpoint, queryParameters: queryParams) { [weak self] result in
+                switch result {
+                    case .success(let movies):
+                        DispatchQueue.main.async {
+                            guard let self = self else { return }
+                            
+                            self.totalPages = movies.totalPages  // Store total number of pages
 
-                        if append {
-                            // Append new movies to the existing list
-                            self.movieList.append(contentsOf: movies.results)
-                        } else {
-                            // Replace the list with the new movies (for the first page)
-                            self.movieList = movies.results
+                            if append {
+                                // Append new movies to the existing list
+                                self.movieList.append(contentsOf: movies.results)
+                            } else {
+                                // Replace the list with the new movies (for the first page)
+                                self.movieList = movies.results
+                            }
+
+                            self.currentPage = page  // Update the current page
+                            self.isLoadingMore = false  // Stop loading indicator
                         }
-
-                        self.currentPage = page  // Update the current page
-                        self.isLoadingMore = false  // Stop loading indicator
+                    case .failure(let error):
+                        print("Failed to retrieve movies: \(error)")
+                        DispatchQueue.main.async {
+                            self?.isLoadingMore = false  // Stop loading indicator even on failure
+                        }
                     }
-                case .failure(let error):
-                    print("Failed to retrieve movies: \(error)")
-                    DispatchQueue.main.async {
-                        self?.isLoadingMore = false  // Stop loading indicator even on failure
-                    }
-                }
-        }
+            }
     }
     
     // Function to load the next page of movies (for infinite scrolling)

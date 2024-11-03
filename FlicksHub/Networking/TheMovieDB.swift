@@ -29,15 +29,35 @@ public class MovieDBAPI {
 public class APICaller {
     static let shared = APICaller()
     
-    static func getMovies(endpoint: String, page: Int, completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void) {
-        let urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US&page=\(page)"
-        
+    static func getMovies(
+        endpoint: String,
+        queryParameters: [String: String] = [:],
+        completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void
+    ) {
+        // Construct the base URL
+        var urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US"
+
+        // Append the page number if provided in the query parameters
+        if let page = queryParameters["page"] {
+            urlString += "&page=\(page)"
+        }
+
+        // Append additional query parameters
+        let additionalParameters = queryParameters
+            .filter { $0.key != "page" }
+            .map { "\($0.key)=\($0.value)" }
+            .joined(separator: "&")
+
+        if !additionalParameters.isEmpty {
+            urlString += "&\(additionalParameters)"
+        }
+
         // Ensure URL is valid
         guard let url = URL(string: urlString) else {
             completion(.failure(.invalidURL))
             return
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(MovieDBAPI.getKey())", forHTTPHeaderField: "Authorization")
@@ -128,6 +148,39 @@ public class APICaller {
                 completion(.success(movies))
             }
         }
+    }
+    
+    static func getGenres(completion: @escaping (APIResult<GenreResponse, NetworkError>) -> Void) {
+        let endpoint = "/genre/movie/list"
+        let urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(.invalidURL))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(MovieDBAPI.getKey())", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(.failure(.networkError(error)))
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            do {
+                let decodedResponse = try JSONDecoder().decode(GenreResponse.self, from: data)
+                completion(.success(decodedResponse))
+            } catch {
+                completion(.failure(.networkError(error)))
+            }
+        }.resume()
     }
 
 }
