@@ -164,19 +164,40 @@ class FavoritesViewModel: ObservableObject {
     }
     
     func deletePlaylist(playlistId: String, completion: @escaping (Bool) -> Void) {
-            let db = Firestore.firestore()
-            let playlistRef = db.collection("playlists").document(playlistId)
-            
-            playlistRef.delete { error in
-                if let error = error {
-                    print("Failed to delete playlist: \(error.localizedDescription)")
-                    completion(false)
-                } else {
-                    print("Playlist deleted successfully with ID \(playlistId)")
-                    // Remove the deleted playlist from the local array
-                    self.userPlaylists.removeAll { $0.id == playlistId }
-                    completion(true)
-                }
+        let db = Firestore.firestore()
+        let playlistRef = db.collection("playlists").document(playlistId)
+        
+        playlistRef.delete { error in
+            if let error = error {
+                print("Failed to delete playlist: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("Playlist deleted successfully with ID \(playlistId)")
+                // Remove the deleted playlist from the local array
+                self.userPlaylists.removeAll { $0.id == playlistId }
+                completion(true)
             }
         }
+    }
+    
+    func editPlaylistName(playlistId: String, newName: String, completion: @escaping (Bool) -> Void)
+    {
+        let db = Firestore.firestore()
+        let playlistRef = db.collection("playlists").document(playlistId)
+
+        // Update the playlist name
+        playlistRef.updateData(["name": newName]) { error in
+            if let error = error {
+                print("Failed to edit playlist name: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("Playlist name updated successfully.")
+                // Update the local playlist array
+                if let index = self.userPlaylists.firstIndex(where: { $0.id == playlistId }) {
+                    self.userPlaylists[index].name = newName
+                }
+                completion(true)
+            }
+        }
+    }
 }

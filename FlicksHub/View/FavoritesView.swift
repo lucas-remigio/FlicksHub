@@ -2,9 +2,8 @@ import SwiftUI
 
 struct FavoritesView: View {
     @ObservedObject private var favoritesViewModel = FavoritesViewModel()
-    @State private var playlists: [Playlist] = []  // Stores user playlists
-    
-    @State private var isLoading = true  // Track loading state
+    @State private var playlists: [Playlist] = []
+    @State private var isLoading = true
     
     var body: some View {
         NavigationView {
@@ -14,7 +13,6 @@ struct FavoritesView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.horizontal)
-                    .padding(.top, 5)
                 
                 if isLoading {
                     ProgressView("Loading playlists...")
@@ -27,27 +25,7 @@ struct FavoritesView: View {
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .center)
                 } else {
-                    List {
-                        ForEach(playlists) { playlist in
-                            NavigationLink(destination: FavoriteDetailView(playlist: playlist)) {
-                                PlaylistRow(
-                                    playlist: playlist,
-                                    onDelete: {
-                                        deletePlaylist(with: playlist.id ?? "")
-                                    }
-                                )
-                            }.buttonStyle(PlainButtonStyle())
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    deletePlaylist(with: playlist.id ?? "")
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
-                            .listRowBackground(Color("MidnightColor").opacity(1))  // Ensure consistent background
-                        }
-                    }
-                    .listStyle(PlainListStyle())
+                    PlaylistsListView(playlists: $playlists, onDelete: deletePlaylist)
                 }
                 
                 Spacer()
@@ -61,6 +39,7 @@ struct FavoritesView: View {
             .background(Color("MidnightColor"))
         }
     }
+    
     
     private func fetchPlaylists() {
         isLoading = true
@@ -82,6 +61,34 @@ struct FavoritesView: View {
                 print("Failed to delete playlist.")
             }
         }
+    }
+}
+
+struct PlaylistsListView: View {
+    @Binding var playlists: [Playlist]
+    let onDelete: (String) -> Void
+
+    var body: some View {
+        List {
+            ForEach($playlists) { $playlist in
+                NavigationLink(destination: FavoriteDetailView(playlist: $playlist)) {
+                    PlaylistRow(
+                        playlist: playlist,
+                        onDelete: { onDelete(playlist.id ?? "") }
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        onDelete(playlist.id ?? "")
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+                .listRowBackground(Color("MidnightColor"))
+            }
+        }
+        .listStyle(PlainListStyle())
     }
 }
 
