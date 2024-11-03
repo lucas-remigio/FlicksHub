@@ -25,12 +25,22 @@ struct PlaylistSelectionView: View {
                 VStack(spacing: 10) {
                     ForEach(playlists) { playlist in
                         Button(action: { onAddToPlaylist(playlist) }) {
-                            Text(playlist.name)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color("MidnightGrayColor"))
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
+                            HStack {
+                                Text(playlist.name)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding()
+                                    .background(Color("MidnightGrayColor"))
+                                    .foregroundColor(.white)
+                                
+                                // Check if the current movie is in the playlist
+                                if playlist.movies.contains(movieId ?? 0) {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(Color("AccentColor"))
+                                        .padding(.trailing, 20)  // Adjust padding for alignment
+                                }
+                            }
+                            .background(Color("MidnightGrayColor"))
+                            .cornerRadius(8)
                         }
                     }
                 }
