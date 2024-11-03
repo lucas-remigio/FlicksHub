@@ -4,6 +4,8 @@ struct FavoritesView: View {
     @ObservedObject private var favoritesViewModel = FavoritesViewModel()
     @State private var playlists: [Playlist] = []  // Stores user playlists
     
+    @State private var isLoading = true  // Track loading state
+    
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
@@ -14,7 +16,12 @@ struct FavoritesView: View {
                     .padding(.horizontal)
                     .padding(.top, 5)
                 
-                if playlists.isEmpty {
+                if isLoading {
+                    ProgressView("Loading playlists...")
+                        .foregroundColor(.gray)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .center)
+                } else if playlists.isEmpty {
                     Text("No playlists available.")
                         .foregroundColor(.gray)
                         .padding()
@@ -56,8 +63,10 @@ struct FavoritesView: View {
     }
     
     private func fetchPlaylists() {
+        isLoading = true
         favoritesViewModel.fetchUserPlaylists { fetchedPlaylists in
             self.playlists = fetchedPlaylists ?? []
+            self.isLoading = false
         }
     }
     
