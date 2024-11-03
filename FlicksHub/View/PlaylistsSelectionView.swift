@@ -62,21 +62,26 @@ struct PlaylistSelectionView: View {
                         }
 
                     Button(action: {
-                        favoritesViewModel.createPlaylist(name: newPlaylistName) { success, error, playlistId in
+                        Task {
+                            // Call the async createPlaylist method
+                            let (success, error, playlistId) = await favoritesViewModel.createPlaylist(name: newPlaylistName)
+                            
                             if success {
                                 // Add movie to playlist created
-                                favoritesViewModel
-                                    .addMovieToPlaylist(
-                                        playlistId: playlistId ?? "",
+                                if let playlistId = playlistId {
+                                    let movieAdded = await favoritesViewModel.addMovieToPlaylist(
+                                        playlistId: playlistId,
                                         movieId: movieId ?? 0
-                                    ) { success in
-                                        if success {
-                                            isCreatingPlaylist = false  // Exit creation mode
-                                            onCreateNewPlaylist(true)   // Close the modal on success
-                                        }
+                                    )
+                                    if movieAdded {
+                                        isCreatingPlaylist = false  // Exit creation mode
+                                        onCreateNewPlaylist(true)   // Close the modal on success
+                                    } else {
+                                        errorMessage = "Failed to add movie to playlist"
                                     }
+                                }
                             } else {
-                                errorMessage = error
+                                errorMessage = error ?? "Unknown error"
                             }
                         }
                     }) {

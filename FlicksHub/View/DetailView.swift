@@ -152,10 +152,12 @@ struct DetailView: View {
                 newPlaylistName: $newPlaylistName,
                 movieId: movieId,
                 onAddToPlaylist: { playlist in
-                    favoritesViewModel.addMovieToPlaylist(
-                        playlistId: playlist.id ?? "",
-                        movieId: movieId
-                    ) { success in
+                    Task {
+                        let success = await favoritesViewModel.addMovieToPlaylist(
+                            playlistId: playlist.id ?? "",
+                            movieId: movieId
+                        )
+
                         if success {
                             // Update local playlist state to include the movie
                             if let index = playlists.firstIndex(where: { $0.id == playlist.id }) {
@@ -163,6 +165,9 @@ struct DetailView: View {
                             }
                             checkIfFavorite()
                             showPlaylistPopup = false  // Only dismiss on success
+                        } else {
+                            // Handle failure case if needed, e.g., show an error message
+                            print("Failed to add movie to playlist")
                         }
                     }
                 },

@@ -39,54 +39,46 @@ class FavoritesViewModel: ObservableObject {
         }
     }
     
-    func createPlaylist(name: String, completion: @escaping (Bool, String?, String?) -> Void) {
-        
-        // validate name
-        if name.isEmpty {
-            completion(false, "Please enter a playlist name", nil)
-            return
+    func createPlaylist(name: String) async -> (Bool, String?, String?) {
+        // Fetch playlists if empty
+        if userPlaylists.isEmpty {
+            do {
+                userPlaylists = try await fetchUserPlaylistsAsync()
+            } catch {
+                print("Failed to fetch playlists: \(error.localizedDescription)")
+                return (false, "Failed to fetch playlists", nil)
+            }
         }
-        
-        if name.count > 25{
-            completion(false, "Playlist name is too long", nil)
-            return
+
+        // Validate the playlist name
+        let validationResult = await validatePlaylistName(name)
+        if !validationResult.isValid {
+            return (false, validationResult.errorMessage, nil)
         }
-        
+
+        // Get current user ID
         guard let userId = Auth.auth().currentUser?.uid else {
             print("User not logged in.")
-            completion(false, "User is not logged in", nil)
-            return
+            return (false, "User is not logged in", nil)
         }
 
-        // If userPlaylists is empty, fetch playlists before creating
-        if userPlaylists.isEmpty {
-            fetchUserPlaylists { [weak self] fetchedPlaylists in
-                guard let self = self else { return }
-                
-                self.userPlaylists = fetchedPlaylists ?? []
+        // Check for duplicate after fetching
+        if userPlaylists.contains(where: { $0.name.lowercased() == name.lowercased() }) {
+            print("A playlist with this name already exists.")
+            return (false, "A playlist with this name already exists.", nil)
+        }
 
-                // Check for duplicate after fetching
-                if self.userPlaylists.contains(where: { $0.name == name }) {
-                    print("A playlist with this name already exists.")
-                    completion(false, "A playlist with this name already exists.", nil)
-                } else {
-                    // No duplicate found, proceed with playlist creation
-                    self.performPlaylistCreation(name: name, userId: userId, completion: completion)
-                }
-            }
-        } else {
-            // Check for duplicate in already fetched playlists
-            if userPlaylists.contains(where: { $0.name == name }) {
-                print("A playlist with this name already exists.")
-                completion(false,"A playlist with this name already exists.", nil)
-            } else {
-                performPlaylistCreation(name: name, userId: userId, completion: completion)
-            }
+        // Proceed with playlist creation
+        do {
+            let playlistId = try await performPlaylistCreation(name: name, userId: userId)
+            return (true, nil, playlistId)
+        } catch {
+            print("Failed to create playlist: \(error.localizedDescription)")
+            return (false, "Failed to create playlist", nil)
         }
     }
 
-    // Helper method to perform the actual creation once checks are complete
-    private func performPlaylistCreation(name: String, userId: String, completion: @escaping (Bool, String?, String?) -> Void) {
+    private func performPlaylistCreation(name: String, userId: String) async throws -> String {
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document()
 
@@ -96,41 +88,35 @@ class FavoritesViewModel: ObservableObject {
             "movies": []
         ]
         
-        playlistRef.setData(data) { error in
-            if let error = error {
-                print("Failed to create playlist: \(error.localizedDescription)")
-                completion(false, nil, nil)
-            } else {
-                print("Playlist created successfully with ID \(playlistRef.documentID)")
-                // Optionally, add the new playlist to the local list
-                self.userPlaylists
-                    .append(
-                        Playlist(
-                            id: playlistRef.documentID,
-                            userId: Auth.auth().currentUser?.uid ?? "",
-                            name: name,
-                            movies: []
-                        )
-                    )
-                completion(true, nil, playlistRef.documentID)
-            }
-        }
+        // Set data asynchronously
+        try await playlistRef.setData(data)
+        
+        // Optionally, add the new playlist to the local list
+        self.userPlaylists.append(
+            Playlist(
+                id: playlistRef.documentID,
+                userId: userId,
+                name: name,
+                movies: []
+            )
+        )
+        
+        return playlistRef.documentID
     }
     
-    func addMovieToPlaylist(playlistId: String, movieId: Int, completion: @escaping (Bool) -> Void) {
+    func addMovieToPlaylist(playlistId: String, movieId: Int) async -> Bool {
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document(playlistId)
         
-        playlistRef.updateData([
-            "movies": FieldValue.arrayUnion([movieId])
-        ]) { error in
-            if let error = error {
-                print("Failed to add movie to playlist: \(error.localizedDescription)")
-                completion(false)
-            } else {
-                print("Movie ID \(movieId) added to playlist \(playlistId).")
-                completion(true)
-            }
+        do {
+            try await playlistRef.updateData([
+                "movies": FieldValue.arrayUnion([movieId])
+            ])
+            print("Movie ID \(movieId) added to playlist \(playlistId).")
+            return true
+        } catch {
+            print("Failed to add movie to playlist: \(error.localizedDescription)")
+            return false
         }
     }
     
@@ -156,6 +142,28 @@ class FavoritesViewModel: ObservableObject {
                     completion(playlists)
                 }
             }
+    }
+    
+    func fetchUserPlaylistsAsync() async throws -> [Playlist] {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw NSError(domain: "AuthError", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not logged in."])
+        }
+
+        let db = Firestore.firestore()
+        
+        // Use the new async Firestore API or wrap the current API in a CheckedContinuation
+        let querySnapshot = try await db.collection("playlists")
+            .whereField("userId", isEqualTo: userId)
+            .getDocuments()
+
+        let playlists = querySnapshot.documents.compactMap { doc -> Playlist? in
+            try? doc.data(as: Playlist.self)
+        }
+        
+        // Update local cache if needed
+        self.userPlaylists = playlists
+        
+        return playlists
     }
     
     func removeMovieFromPlaylist(playlistId: String, movieId: Int, completion: @escaping (Bool) -> Void) {
@@ -192,35 +200,82 @@ class FavoritesViewModel: ObservableObject {
         }
     }
     
-    func editPlaylistName(playlistId: String, newName: String, completion: @escaping (Bool, String?) -> Void)
-    {
+    func editPlaylistName(playlistId: String, newName: String) async -> (Bool, String?) {
+        // Validate the playlist name asynchronously
+        let validationResult = await validatePlaylistName(newName)
+
+        // If validation fails, return the error
+        if !validationResult.isValid {
+            return (false, validationResult.errorMessage)
+        }
+        
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document(playlistId)
-        
-        // validate new name
-        if newName.isEmpty {
-            completion(false, "Please enter a playlist name.")
-            return
+
+        do {
+            // Attempt to update the playlist name in Firestore
+            try await playlistRef.updateData(["name": newName])
+            print("Playlist name updated successfully.")
+            
+            // Update the local playlist array
+            if let index = self.userPlaylists.firstIndex(where: { $0.id == playlistId }) {
+                self.userPlaylists[index].name = newName
+            }
+            return (true, nil)
+        } catch {
+            // Handle any errors from Firestore
+            print("Failed to edit playlist name: \(error.localizedDescription)")
+            return (false, "Error editing playlist name.")
         }
-        
-        if newName.count > 25 {
-            completion(false, "Playlist name is too long.")
-            return
+    }
+    
+    func validatePlaylistName(_ name: String) async -> (isValid: Bool, errorMessage: String?) {
+        // Check if the name is empty
+        if name.isEmpty {
+            return (false, "Please enter a playlist name")
         }
 
-        // Update the playlist name
-        playlistRef.updateData(["name": newName]) { error in
-            if let error = error {
-                print("Failed to edit playlist name: \(error.localizedDescription)")
-                completion(false, "Error editing playlist name.")
-            } else {
-                print("Playlist name updated successfully.")
-                // Update the local playlist array
-                if let index = self.userPlaylists.firstIndex(where: { $0.id == playlistId }) {
-                    self.userPlaylists[index].name = newName
-                }
-                completion(true, "Success")
+        // Check if the name is too long
+        if name.count > 25 {
+            return (false, "Playlist name is too long")
+        }
+
+        // Check if the name is too short
+        if name.count < 3 {
+            return (false, "Playlist name is too short")
+        }
+
+        // Trim leading and trailing whitespaces and check if the name is empty
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.isEmpty {
+            return (false, "Playlist name cannot be just spaces")
+        }
+
+        // Fetch playlists if userPlaylists is empty
+        if self.userPlaylists.isEmpty {
+            do {
+                self.userPlaylists = try await fetchUserPlaylistsAsync()
+            } catch {
+                return (false, "Failed to fetch playlists: \(error.localizedDescription)")
             }
         }
+
+        // Check for duplicate names (case insensitive)
+        if userPlaylists.contains(where: { $0.name.lowercased() == trimmedName.lowercased() }) {
+            return (false, "A playlist with this name already exists")
+        }
+
+        // Limit the number of playlists a user can create
+        if userPlaylists.count >= 100 {
+            return (false, "You have reached the maximum number of playlists")
+        }
+
+        // Check for sequential spaces in the name
+        if trimmedName.contains("  ") {
+            return (false, "Playlist name cannot contain sequential spaces")
+        }
+
+        // If all validations pass, return true
+        return (true, nil)
     }
 }
