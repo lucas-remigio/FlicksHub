@@ -151,18 +151,25 @@ struct DetailView: View {
                 newPlaylistName: $newPlaylistName,
                 movieId: movieId,
                 onAddToPlaylist: { playlist in
-                    favoritesViewModel
-                        .addMovieToPlaylist(
-                            playlistId: playlist.id ?? "",
-                            movieId: movieId) { success in
-                               
-                            }
-                    showPlaylistPopup = false // Dismiss the popup
+                    favoritesViewModel.addMovieToPlaylist(
+                        playlistId: playlist.id ?? "",
+                        movieId: movieId
+                    ) { success in
+                        if success {
+                            showPlaylistPopup = false  // Only dismiss on success
+                        } else {
+                            // Handle the error internally without dismissing
+                        }
+                    }
                 },
                 onCreateNewPlaylist: { success in
                     if success {
-                        showPlaylistPopup = false // Dismiss the popup
+                        print("DO NOT CLOSE \(success)")
+                        showPlaylistPopup = false  // Dismiss the popup on success
                         newPlaylistName = ""
+                    } else {
+                        // Do not dismiss the popup on failure
+                        // Handle the error state, e.g., show an error message
                     }
                 }
             ).background(Color("MidnightColor"))

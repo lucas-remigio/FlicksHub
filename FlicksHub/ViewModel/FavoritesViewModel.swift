@@ -39,10 +39,22 @@ class FavoritesViewModel: ObservableObject {
         }
     }
     
-    func createPlaylist(name: String, completion: @escaping (Bool, String?) -> Void) {
+    func createPlaylist(name: String, completion: @escaping (Bool, String?, String?) -> Void) {
+        
+        // validate name
+        if name.isEmpty {
+            completion(false, "Please enter a playlist name", nil)
+            return
+        }
+        
+        if name.count > 25{
+            completion(false, "Playlist name is too long", nil)
+            return
+        }
+        
         guard let userId = Auth.auth().currentUser?.uid else {
             print("User not logged in.")
-            completion(false, nil)
+            completion(false, "User is not logged in", nil)
             return
         }
 
@@ -56,7 +68,7 @@ class FavoritesViewModel: ObservableObject {
                 // Check for duplicate after fetching
                 if self.userPlaylists.contains(where: { $0.name == name }) {
                     print("A playlist with this name already exists.")
-                    completion(false, nil)
+                    completion(false, "A playlist with this name already exists.", nil)
                 } else {
                     // No duplicate found, proceed with playlist creation
                     self.performPlaylistCreation(name: name, userId: userId, completion: completion)
@@ -66,7 +78,7 @@ class FavoritesViewModel: ObservableObject {
             // Check for duplicate in already fetched playlists
             if userPlaylists.contains(where: { $0.name == name }) {
                 print("A playlist with this name already exists.")
-                completion(false, nil)
+                completion(false,"A playlist with this name already exists.", nil)
             } else {
                 performPlaylistCreation(name: name, userId: userId, completion: completion)
             }
@@ -74,7 +86,7 @@ class FavoritesViewModel: ObservableObject {
     }
 
     // Helper method to perform the actual creation once checks are complete
-    private func performPlaylistCreation(name: String, userId: String, completion: @escaping (Bool, String?) -> Void) {
+    private func performPlaylistCreation(name: String, userId: String, completion: @escaping (Bool, String?, String?) -> Void) {
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document()
 
@@ -83,11 +95,11 @@ class FavoritesViewModel: ObservableObject {
             "name": name,
             "movies": []
         ]
-
+        
         playlistRef.setData(data) { error in
             if let error = error {
                 print("Failed to create playlist: \(error.localizedDescription)")
-                completion(false, nil)
+                completion(false, nil, nil)
             } else {
                 print("Playlist created successfully with ID \(playlistRef.documentID)")
                 // Optionally, add the new playlist to the local list
@@ -100,7 +112,7 @@ class FavoritesViewModel: ObservableObject {
                             movies: []
                         )
                     )
-                completion(true, playlistRef.documentID)
+                completion(true, nil, playlistRef.documentID)
             }
         }
     }
@@ -180,23 +192,34 @@ class FavoritesViewModel: ObservableObject {
         }
     }
     
-    func editPlaylistName(playlistId: String, newName: String, completion: @escaping (Bool) -> Void)
+    func editPlaylistName(playlistId: String, newName: String, completion: @escaping (Bool, String?) -> Void)
     {
         let db = Firestore.firestore()
         let playlistRef = db.collection("playlists").document(playlistId)
+        
+        // validate new name
+        if newName.isEmpty {
+            completion(false, "Please enter a playlist name.")
+            return
+        }
+        
+        if newName.count > 25 {
+            completion(false, "Playlist name is too long.")
+            return
+        }
 
         // Update the playlist name
         playlistRef.updateData(["name": newName]) { error in
             if let error = error {
                 print("Failed to edit playlist name: \(error.localizedDescription)")
-                completion(false)
+                completion(false, "Error editing playlist name.")
             } else {
                 print("Playlist name updated successfully.")
                 // Update the local playlist array
                 if let index = self.userPlaylists.firstIndex(where: { $0.id == playlistId }) {
                     self.userPlaylists[index].name = newName
                 }
-                completion(true)
+                completion(true, "Success")
             }
         }
     }

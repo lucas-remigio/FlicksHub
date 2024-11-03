@@ -8,6 +8,7 @@ struct FavoriteDetailView: View {
     @State private var showEditAlert = false  // Controls the alert for editing the name
     @State private var newPlaylistName = ""  // Stores the new name for the playlist
     @State private var moviesLoaded = false  // To prevent multiple loads
+    @State private var message: String? = nil  // Holds error or success message
 
     var body: some View {
         VStack {
@@ -28,6 +29,20 @@ struct FavoriteDetailView: View {
                 }
             }
             .padding(.horizontal)
+            
+            // Display error message
+            if let message = message {
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundColor(.red)
+                    .padding(.horizontal)
+                    .multilineTextAlignment(.center)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            self.message = nil  // Clear message after 3 seconds
+                        }
+                    }
+            }
             
             if isLoading {
                 ProgressView("Loading movies...")
@@ -98,12 +113,12 @@ struct FavoriteDetailView: View {
     private func updatePlaylistName() {
         guard let playlistId = playlist.id else { return }
 
-        viewModel.editPlaylistName(playlistId: playlistId, newName: newPlaylistName) { success in
-            if success {                
+        viewModel.editPlaylistName(playlistId: playlistId, newName: newPlaylistName) { success, errorMessage in
+            if success {
                 playlist.name = newPlaylistName
-                print(playlist.movies)
                 print("Playlist name updated")
             } else {
+                message = errorMessage
                 print("Failed to update playlist name")
             }
         }

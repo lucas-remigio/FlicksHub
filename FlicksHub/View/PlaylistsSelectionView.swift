@@ -51,7 +51,7 @@ struct PlaylistSelectionView: View {
                     .padding()
 
                 Button(action: {
-                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success, playlistId in
+                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success, error, playlistId in
                         if success {
                             // add movie to playlist created
                             favoritesViewModel
@@ -59,15 +59,14 @@ struct PlaylistSelectionView: View {
                                     playlistId: playlistId ?? "",
                                     movieId: movieId ?? 0
                                 ) { success in
-                                       
+                                    if success {
+                                        isCreatingPlaylist = false  // Exit creation mode
+                                        onCreateNewPlaylist(true)   // Close the modal on success
                                     }
-                                                       
-                            isCreatingPlaylist = false  // Exit creation mode
-                            onCreateNewPlaylist(true)  // Emit event to close modal
-                            
+                                }
                         } else {
-                            errorMessage = "A playlist with this name already exists."
-                            onCreateNewPlaylist(false)
+                            print(success)
+                            errorMessage = error
                         }
                     }
                 }) {
