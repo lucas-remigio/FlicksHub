@@ -142,6 +142,7 @@ struct DetailView: View {
             favoritesViewModel.fetchUserPlaylists(completion: {fetchedPlaylists in
                 let playlists = fetchedPlaylists ?? []
                 self.playlists = playlists
+                checkIfFavorite()
             })
         }
         .sheet(isPresented: $showPlaylistPopup) {
@@ -156,9 +157,12 @@ struct DetailView: View {
                         movieId: movieId
                     ) { success in
                         if success {
+                            // Update local playlist state to include the movie
+                            if let index = playlists.firstIndex(where: { $0.id == playlist.id }) {
+                                playlists[index].movies.append(movieId)
+                            }
+                            checkIfFavorite()
                             showPlaylistPopup = false  // Only dismiss on success
-                        } else {
-                            // Handle the error internally without dismissing
                         }
                     }
                 },
@@ -166,14 +170,21 @@ struct DetailView: View {
                     if success {
                         showPlaylistPopup = false  // Dismiss the popup on success
                         newPlaylistName = ""
-                    } else {
-                        // Do not dismiss the popup on failure
-                        // Handle the error state, e.g., show an error message
+                        favoritesViewModel.fetchUserPlaylists { fetchedPlaylists in
+                            playlists = fetchedPlaylists ?? []
+                            checkIfFavorite()
+                        }
                     }
                 }
             ).background(Color("MidnightColor"))
         }
     }
+    
+    private func checkIfFavorite() {
+        self.isFavorite = playlists.contains { playlist in
+                playlist.movies.contains(movieId)
+            }
+        }
 }
 
 #Preview   {
