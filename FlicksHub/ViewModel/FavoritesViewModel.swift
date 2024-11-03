@@ -62,12 +62,6 @@ class FavoritesViewModel: ObservableObject {
             return (false, "User is not logged in", nil)
         }
 
-        // Check for duplicate after fetching
-        if userPlaylists.contains(where: { $0.name.lowercased() == name.lowercased() }) {
-            print("A playlist with this name already exists.")
-            return (false, "A playlist with this name already exists.", nil)
-        }
-
         // Proceed with playlist creation
         do {
             let playlistId = try await performPlaylistCreation(name: name, userId: userId)
@@ -230,25 +224,27 @@ class FavoritesViewModel: ObservableObject {
     }
     
     func validatePlaylistName(_ name: String) async -> (isValid: Bool, errorMessage: String?) {
-        // Check if the name is empty
-        if name.isEmpty {
-            return (false, "Please enter a playlist name")
+        // Trim leading and trailing whitespaces
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Check if the trimmed name is empty
+        if trimmedName.isEmpty {
+            return (false, "Please enter a valid playlist name")
         }
 
-        // Check if the name is too long
-        if name.count > 25 {
+        // Check if the trimmed name is too long
+        if trimmedName.count > 25 {
             return (false, "Playlist name is too long")
         }
 
-        // Check if the name is too short
-        if name.count < 3 {
+        // Check if the trimmed name is too short
+        if trimmedName.count < 3 {
             return (false, "Playlist name is too short")
         }
 
-        // Trim leading and trailing whitespaces and check if the name is empty
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmedName.isEmpty {
-            return (false, "Playlist name cannot be just spaces")
+        // Check for sequential spaces in the trimmed name
+        if trimmedName.contains("  ") {
+            return (false, "Playlist name cannot contain sequential spaces")
         }
 
         // Fetch playlists if userPlaylists is empty
@@ -260,7 +256,7 @@ class FavoritesViewModel: ObservableObject {
             }
         }
 
-        // Check for duplicate names (case insensitive)
+        // Check for duplicate names (case insensitive) using the trimmed name
         if userPlaylists.contains(where: { $0.name.lowercased() == trimmedName.lowercased() }) {
             return (false, "A playlist with this name already exists")
         }
@@ -268,11 +264,6 @@ class FavoritesViewModel: ObservableObject {
         // Limit the number of playlists a user can create
         if userPlaylists.count >= 100 {
             return (false, "You have reached the maximum number of playlists")
-        }
-
-        // Check for sequential spaces in the name
-        if trimmedName.contains("  ") {
-            return (false, "Playlist name cannot contain sequential spaces")
         }
 
         // If all validations pass, return true

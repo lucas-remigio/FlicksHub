@@ -112,12 +112,14 @@ struct FavoriteDetailView: View {
     
     private func updatePlaylistName() {
         guard let playlistId = playlist.id else { return }
+        
+        let trimmedName = newPlaylistName.trimmingCharacters(in: .whitespacesAndNewlines)
 
         Task {
-            let (success, errorMessage) = await viewModel.editPlaylistName(playlistId: playlistId, newName: newPlaylistName)
+            let (success, errorMessage) = await viewModel.editPlaylistName(playlistId: playlistId, newName: trimmedName)
 
             if success {
-                playlist.name = newPlaylistName
+                playlist.name = trimmedName
                 print("Playlist name updated")
             } else {
                 message = errorMessage ?? "Failed to update playlist name"

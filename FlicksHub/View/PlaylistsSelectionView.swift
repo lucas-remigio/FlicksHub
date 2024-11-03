@@ -63,8 +63,10 @@ struct PlaylistSelectionView: View {
 
                     Button(action: {
                         Task {
+                            let trimmedName = newPlaylistName.trimmingCharacters(in: .whitespacesAndNewlines)
+                            
                             // Call the async createPlaylist method
-                            let (success, error, playlistId) = await favoritesViewModel.createPlaylist(name: newPlaylistName)
+                            let (success, error, playlistId) = await favoritesViewModel.createPlaylist(name: trimmedName)
                             
                             if success {
                                 // Add movie to playlist created
