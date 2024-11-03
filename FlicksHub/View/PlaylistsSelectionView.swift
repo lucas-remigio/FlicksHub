@@ -1,10 +1,3 @@
-//
-//  PlyalistsSelectionView.swift
-//  FlicksHub
-//
-//  Created by Lucas Remigio on 27/10/2024.
-//
-
 import Foundation
 import Combine
 import SwiftUI
@@ -15,7 +8,7 @@ struct PlaylistSelectionView: View {
     @Binding var isCreatingPlaylist: Bool
     @Binding var newPlaylistName: String
     let movieId: Int?
-    @State private var errorMessage: String?
+    @State private var errorMessage: String? = nil
     var onAddToPlaylist: (Playlist) -> Void
     var onCreateNewPlaylist: (Bool) -> Void
     
@@ -26,7 +19,7 @@ struct PlaylistSelectionView: View {
             Text("Add to Playlist")
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundColor(Color.white)
+                .foregroundColor(.white)
 
             ScrollView {
                 VStack(spacing: 10) {
@@ -36,7 +29,7 @@ struct PlaylistSelectionView: View {
                                 .padding()
                                 .frame(maxWidth: .infinity)
                                 .background(Color("MidnightGrayColor"))
-                                .foregroundColor(Color.white)
+                                .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
                     }
@@ -46,50 +39,65 @@ struct PlaylistSelectionView: View {
             Divider().padding(.vertical, 10)
 
             if isCreatingPlaylist {
-                TextField("Playlist Name", text: $newPlaylistName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-
-                Button(action: {
-                    favoritesViewModel.createPlaylist(name: newPlaylistName) { success, error, playlistId in
-                        if success {
-                            // add movie to playlist created
-                            favoritesViewModel
-                                .addMovieToPlaylist(
-                                    playlistId: playlistId ?? "",
-                                    movieId: movieId ?? 0
-                                ) { success in
-                                    if success {
-                                        isCreatingPlaylist = false  // Exit creation mode
-                                        onCreateNewPlaylist(true)   // Close the modal on success
-                                    }
-                                }
-                        } else {
-                            print(success)
-                            errorMessage = error
-                        }
-                    }
-                }) {
-                    Text("Create Playlist")
+                VStack(spacing: 10) {
+                    TextField("Playlist Name", text: $newPlaylistName)
                         .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color("AccentColor"))
-                        .foregroundColor(.white)
+                        .background(Color("MidnightGrayColor"))
                         .cornerRadius(8)
+                        .foregroundColor(.white)
+                        .placeholder(when: newPlaylistName.isEmpty) {
+                            Text("Enter playlist name")
+                                .foregroundColor(Color.white)
+                                .padding(.leading, 10)
+                        }
+
+                    Button(action: {
+                        favoritesViewModel.createPlaylist(name: newPlaylistName) { success, error, playlistId in
+                            if success {
+                                // Add movie to playlist created
+                                favoritesViewModel
+                                    .addMovieToPlaylist(
+                                        playlistId: playlistId ?? "",
+                                        movieId: movieId ?? 0
+                                    ) { success in
+                                        if success {
+                                            isCreatingPlaylist = false  // Exit creation mode
+                                            onCreateNewPlaylist(true)   // Close the modal on success
+                                        }
+                                    }
+                            } else {
+                                errorMessage = error
+                            }
+                        }
+                    }) {
+                        Text("Create Playlist")
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color("AccentColor"))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+
+                    // Show error message if present
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .padding(.top, 5)
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                    self.errorMessage = nil
+                                }
+                            }
+                    }
                 }
-                
-                // Show error message if present
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .padding(.top, 5)
-                }
+                .padding(.horizontal)
             } else {
                 Button(action: { isCreatingPlaylist = true }) {
                     Text("Create New Playlist")
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color("MidnightGrayColor"))
+                        .foregroundColor(.white)
                         .cornerRadius(8)
                 }
             }
@@ -103,6 +111,20 @@ struct PlaylistSelectionView: View {
         .shadow(radius: 10)
         .onDisappear {
             isCreatingPlaylist = false
+        }
+    }
+}
+
+extension View {
+    /// Adds a placeholder to a `TextField`.
+    @ViewBuilder func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content
+    ) -> some View {
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
         }
     }
 }

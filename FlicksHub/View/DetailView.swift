@@ -164,7 +164,6 @@ struct DetailView: View {
                 },
                 onCreateNewPlaylist: { success in
                     if success {
-                        print("DO NOT CLOSE \(success)")
                         showPlaylistPopup = false  // Dismiss the popup on success
                         newPlaylistName = ""
                     } else {
