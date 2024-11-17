@@ -99,7 +99,8 @@ class ProfileViewModel: ObservableObject {
         let storageRef = Storage.storage().reference().child(
             "profileImages/\(authService.getSavedUID() ?? UUID().uuidString).jpg"
         )
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+        
+        guard let imageData = image.jpegData(compressionQuality: 0.5) else {
             completion(nil)
             return
         }
