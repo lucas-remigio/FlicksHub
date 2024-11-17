@@ -61,7 +61,9 @@ struct SearchView: View {
                             .background(Color("MidnightGrayColor"))
                             .cornerRadius(8)
                     }
-
+                    
+                    Spacer() // Add spacer for even spacing
+                    
                     // Genre Filter
                     Menu {
                         Button("All") {
@@ -83,7 +85,8 @@ struct SearchView: View {
                             .background(Color("MidnightGrayColor"))
                             .cornerRadius(8)
                     }
-
+                    
+                    Spacer() // Add spacer for even spacing
                     
                     // Rating Filter
                     Menu {
