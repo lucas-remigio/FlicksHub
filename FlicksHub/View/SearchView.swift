@@ -18,7 +18,6 @@ struct SearchView: View {
     private var cancellables = Set<AnyCancellable>()
 
     var body: some View {
-        NavigationView {
             VStack(alignment: .leading) {
                 // Search bar
                 HStack {
@@ -138,9 +137,11 @@ struct SearchView: View {
                     viewModel.fetchGenres()  // Fetch genres when the view appears
                 }
             }
-            .navigationBarHidden(true)
+            
+            .navigationBarTitle("Search", displayMode: .inline) // Add a title to the navigation bar
+            .navigationBarBackButtonHidden(false) // Ensure the back button is visible
         }
-    }
+    
 }
 
 #Preview {
