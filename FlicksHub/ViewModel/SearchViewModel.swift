@@ -14,9 +14,10 @@ class SearchViewModel: ObservableObject {
 
     private var currentPage = 1
     private var totalPages = 1
+    private var cancellables: Set<AnyCancellable> = []  // To store Combine subscriptions
     
     func retrieveMovies(page: Int = 1, append: Bool = false) {
-        let endpoint = "/discover/movie"
+        let endpoint = searchText.isEmpty ? "/discover/movie" : "/search/movie"
         
         var queryParameters: [String: String] = [
             "page": "\(page)",
@@ -24,8 +25,11 @@ class SearchViewModel: ObservableObject {
             "language": "en-US"
         ]
         
+        print("retrieve movies : "  + searchText)
+        
         // Add search query if applicable
         if !searchText.isEmpty {
+            print("text is not empty " + searchText)
             queryParameters["query"] = searchText
         }
 

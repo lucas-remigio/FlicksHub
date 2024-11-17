@@ -54,8 +54,6 @@ public class APICaller {
             completion(.failure(.invalidURL))
             return
         }
-        
-        print(url)
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -75,7 +73,6 @@ public class APICaller {
             do {
                 // Decode the response data
                 let decodedResponse = try JSONDecoder().decode(PopularMoviesResponse.self, from: data)
-                print(String(data: data, encoding: .utf8) ?? "No response data")
                 completion(.success(decodedResponse))
             } catch {
                 completion(.failure(.networkError(error)))

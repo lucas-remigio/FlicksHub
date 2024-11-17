@@ -5,21 +5,24 @@
 //  Created by Lucas Remigio on 03/11/2024.
 //
 import SwiftUI
+import Combine
 
 struct SearchView: View {
-    @State var searchText: String = ""
     @ObservedObject var viewModel = SearchViewModel()
     
     @State private var selectedYear: String = "All"  // Default to "All" for Year
     @State private var selectedGenre: String = "All" // Default to "All" for Genre
     @State private var selectedRating: Double = 0.0  // Rating as Double for Slider
     
+    // A cancellable reference for Combine publishers
+    private var cancellables = Set<AnyCancellable>()
+
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
                 // Search bar
                 HStack {
-                    TextField("Search", text: $searchText)
+                    TextField("Search", text: $viewModel.searchText)
                         .padding(10)
                         .background(Color.white.opacity(1))
                         .foregroundColor(Color.black)
@@ -27,9 +30,14 @@ struct SearchView: View {
                         .overlay(
                             HStack {
                                 Spacer()
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(Color.accentColor)
-                                    .padding(.trailing, 10)
+                                Button(action: {
+                                    viewModel.retrieveMovies()
+                                }) {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundColor(viewModel.searchText.isEmpty ? .gray : Color.accentColor)
+                                        .padding(.trailing, 10)
+                                }
+                                .disabled(viewModel.searchText.isEmpty)
                             }
                         )
                 }
@@ -37,18 +45,35 @@ struct SearchView: View {
                 
                 // Filters for Year, Genre, and Rating
                 HStack(spacing: 10) {
+                    // Year Filter
+                    Menu {
+                        ForEach(viewModel.years, id: \.self) { year in
+                            Button(year) {
+                                selectedYear = year
+                                viewModel.selectedYear = year == "All" ? "" : year
+                                viewModel.retrieveMovies()
+                            }
+                        }
+                    } label: {
+                        Label("Year: \(selectedYear)", systemImage: "arrowtriangle.down.fill")
+                            .font(.caption)
+                            .padding(10)
+                            .background(Color("MidnightGrayColor"))
+                            .cornerRadius(8)
+                    }
+
                     // Genre Filter
                     Menu {
                         Button("All") {
                             selectedGenre = "All"
-                            viewModel.selectedGenre = "All"
-                            viewModel.retrieveMovies()  // Update movies
+                            viewModel.selectedGenre = ""
+                            viewModel.retrieveMovies()
                         }
                         ForEach(viewModel.genres, id: \.id) { genre in
                             Button(genre.name) {
-                                selectedGenre = "\(genre.name)"
+                                selectedGenre = genre.name
                                 viewModel.selectedGenre = "\(genre.id)"
-                                viewModel.retrieveMovies()  // Update movies
+                                viewModel.retrieveMovies()
                             }
                         }
                     } label: {
@@ -58,13 +83,36 @@ struct SearchView: View {
                             .background(Color("MidnightGrayColor"))
                             .cornerRadius(8)
                     }
+
+                    
+                    // Rating Filter
+                    Menu {
+                        VStack {
+                            Text("Rating: \(Int(selectedRating))")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .padding(.bottom, 5)
+                            Slider(value: $selectedRating, in: 0...10, step: 1)
+                                .padding(.horizontal)
+                                .onChange(of: selectedRating) { _, newValue in
+                                    viewModel.selectedRating = newValue == 0 ? nil : newValue
+                                    viewModel.retrieveMovies()
+                                }
+                        }
+                        .padding()
+                    } label: {
+                        Label("Rating: \(Int(selectedRating))", systemImage: "arrowtriangle.down.fill")
+                            .font(.caption)
+                            .padding(10)
+                            .background(Color("MidnightGrayColor"))
+                            .cornerRadius(8)
+                    }
                 }
+                .padding(.horizontal)
                 
                 // List of movies
                 List {
-                    ForEach(viewModel.movieList.filter { movie in
-                        searchText.isEmpty || movie.title.localizedCaseInsensitiveContains(searchText)
-                    }) { movie in
+                    ForEach(viewModel.movieList) { movie in
                         NavigationLink(destination: DetailView(movieId: movie.id)) {
                             MovieRowView(movie: movie)
                         }
