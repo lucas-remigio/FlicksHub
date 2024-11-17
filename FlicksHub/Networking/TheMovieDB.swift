@@ -35,28 +35,27 @@ public class APICaller {
         completion: @escaping (APIResult<PopularMoviesResponse, NetworkError>) -> Void
     ) {
         // Construct the base URL
-        var urlString = "\(NetworkConstant.shared.serverAddress)\(endpoint)?language=en-US"
-
-        // Append the page number if provided in the query parameters
-        if let page = queryParameters["page"] {
-            urlString += "&page=\(page)"
-        }
-
-        // Append additional query parameters
-        let additionalParameters = queryParameters
-            .filter { $0.key != "page" }
-            .map { "\($0.key)=\($0.value)" }
-            .joined(separator: "&")
-
-        if !additionalParameters.isEmpty {
-            urlString += "&\(additionalParameters)"
-        }
-
-        // Ensure URL is valid
-        guard let url = URL(string: urlString) else {
+        guard var urlComponents = URLComponents(string: "\(NetworkConstant.shared.serverAddress)\(endpoint)") else {
             completion(.failure(.invalidURL))
             return
         }
+
+        // Add fixed query parameters
+        var queryItems = [URLQueryItem(name: "language", value: "en-US")]
+
+        // Add dynamic query parameters from `queryParameters`
+        queryItems.append(contentsOf: queryParameters.map { URLQueryItem(name: $0.key, value: $0.value) })
+
+        // Assign query items to the URL components
+        urlComponents.queryItems = queryItems
+
+        // Ensure the final URL is valid
+        guard let url = urlComponents.url else {
+            completion(.failure(.invalidURL))
+            return
+        }
+        
+        print(url)
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -76,6 +75,7 @@ public class APICaller {
             do {
                 // Decode the response data
                 let decodedResponse = try JSONDecoder().decode(PopularMoviesResponse.self, from: data)
+                print(String(data: data, encoding: .utf8) ?? "No response data")
                 completion(.success(decodedResponse))
             } catch {
                 completion(.failure(.networkError(error)))

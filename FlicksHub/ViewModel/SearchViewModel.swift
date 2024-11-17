@@ -3,10 +3,12 @@ import Foundation
 
 class SearchViewModel: ObservableObject {
     @Published var movieList: [Movie] = []
+    @Published var genres: [Genre] = []  // Store genres
     @Published var isLoadingMore = false
     @Published var selectedYear: String = ""  // To filter by year
     @Published var selectedGenre: String = ""  // To filter by genre
     @Published var selectedRating: Double?  // To filter by rating (e.g., 7.0 for 7+)
+    @Published var searchText: String = ""
     
     @Published var years: [String] = (1950...2024).map { "\($0)" } + ["All"]
 
@@ -14,9 +16,18 @@ class SearchViewModel: ObservableObject {
     private var totalPages = 1
     
     func retrieveMovies(page: Int = 1, append: Bool = false) {
+        let endpoint = "/discover/movie"
+        
         var queryParameters: [String: String] = [
-            "page": "\(page)"
+            "page": "\(page)",
+            "include_adult": "false",
+            "language": "en-US"
         ]
+        
+        // Add search query if applicable
+        if !searchText.isEmpty {
+            queryParameters["query"] = searchText
+        }
 
         // Add year filter if selected
         if !selectedYear.isEmpty {
@@ -34,7 +45,7 @@ class SearchViewModel: ObservableObject {
         }
 
         APICaller
-            .getMovies(endpoint: "", queryParameters: queryParameters) { [weak self] result in
+            .getMovies(endpoint: endpoint, queryParameters: queryParameters) { [weak self] result in
             switch result {
                 case .success(let movies):
                     DispatchQueue.main.async {
@@ -62,5 +73,18 @@ class SearchViewModel: ObservableObject {
         isLoadingMore = true
         let nextPage = currentPage + 1
         retrieveMovies(page: nextPage, append: true)
+    }
+    
+    func fetchGenres() {
+        APICaller.getGenres { [weak self] result in
+            switch result {
+            case .success(let genreResponse):
+                DispatchQueue.main.async {
+                    self?.genres = genreResponse.genres
+                }
+            case .failure(let error):
+                print("Failed to fetch genres: \(error)")
+            }
+        }
     }
 }

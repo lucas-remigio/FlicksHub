@@ -37,7 +37,27 @@ struct SearchView: View {
                 
                 // Filters for Year, Genre, and Rating
                 HStack(spacing: 10) {
-                    
+                    // Genre Filter
+                    Menu {
+                        Button("All") {
+                            selectedGenre = "All"
+                            viewModel.selectedGenre = "All"
+                            viewModel.retrieveMovies()  // Update movies
+                        }
+                        ForEach(viewModel.genres, id: \.id) { genre in
+                            Button(genre.name) {
+                                selectedGenre = "\(genre.name)"
+                                viewModel.selectedGenre = "\(genre.id)"
+                                viewModel.retrieveMovies()  // Update movies
+                            }
+                        }
+                    } label: {
+                        Label("Genre: \(selectedGenre)", systemImage: "arrowtriangle.down.fill")
+                            .font(.caption)
+                            .padding(10)
+                            .background(Color("MidnightGrayColor"))
+                            .cornerRadius(8)
+                    }
                 }
                 
                 // List of movies
@@ -64,6 +84,7 @@ struct SearchView: View {
                 .scrollContentBackground(.hidden)
                 .onAppear {
                     viewModel.retrieveMovies()
+                    viewModel.fetchGenres()  // Fetch genres when the view appears
                 }
             }
             .navigationBarHidden(true)
