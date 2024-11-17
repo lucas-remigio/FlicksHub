@@ -36,7 +36,6 @@ struct SearchView: View {
                                         .foregroundColor(viewModel.searchText.isEmpty ? .gray : Color.accentColor)
                                         .padding(.trailing, 10)
                                 }
-                                .disabled(viewModel.searchText.isEmpty)
                             }
                         )
                 }
