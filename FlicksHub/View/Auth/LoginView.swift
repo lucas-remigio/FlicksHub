@@ -16,7 +16,7 @@ struct LoginView: View {
     var body: some View {
         VStack {
             // App Title
-            Text("FlicksApp")
+            Text("FlicksHub")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.white)

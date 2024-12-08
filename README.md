@@ -15,7 +15,7 @@
 
 ### **2. Advanced Search Filters**
 - **Search Bar**: Quickly find movies by title.
-- **Year Filter**: Choose a specific release year or a range.
+- **Year Filter**: Choose a specific release year.
 - **Genre Filter**: Select one or multiple genres (e.g., Action, Comedy, Drama).
 - **Rating Filter**: Set a minimum rating (e.g., above 7.0) to filter movies with high reviews.
 
