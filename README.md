@@ -5,6 +5,11 @@
 
 **FlicksHub** is a mobile application designed to offer users an engaging and personalized way to explore and discover movies. With features such as advanced search, curated playlists, and real-time synchronization, FlicksHub provides a comprehensive platform for movie enthusiasts. The app leverages TheMovieDB API for detailed movie data and Firebase for user authentication and cloud storage.
 
+## Demo
+
+https://github.com/user-attachments/assets/e871cfb0-2d9e-44e2-a404-5f22346e95dd
+
+
 ---
 
 ## Features
